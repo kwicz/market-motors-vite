@@ -1,0 +1,146 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/clarendon-narrow');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 5% 90%;
+    --foreground: 240 3% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 3% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 3% 18%;
+
+    --primary: 165 20% 33%;
+    --primary-foreground: 60 5% 90%;
+
+    --secondary: 60 5% 95%;
+    --secondary-foreground: 240 3% 18%;
+
+    --muted: 60 5% 95%;
+    --muted-foreground: 240 3% 46%;
+
+    --accent: 45 80% 52%;
+    --accent-foreground: 240 3% 18%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 5% 90%;
+
+    --border: 165 20% 33% / 20%;
+    --input: 165 20% 33% / 20%;
+    --ring: 165 20% 33%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-market-background text-market-text font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-clarendon;
+  }
+  
+  #root {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes scaleIn {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+  
+  .page-transition-enter {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  
+  .page-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 400ms, transform 400ms;
+  }
+  
+  .page-transition-exit {
+    opacity: 1;
+  }
+  
+  .page-transition-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  /* Glass morphism */
+  .glass {
+    background: rgba(230, 230, 228, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(64, 88, 85, 0.18);
+  }
+  
+  .glass-dark {
+    background: rgba(43, 43, 46, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Market Motors specific styles */
+  .market-btn {
+    @apply bg-market-accent text-white hover:bg-market-accent/90 transition-colors;
+  }
+
+  .market-btn-outline {
+    @apply border border-market-accent text-market-accent hover:bg-market-accent/10 transition-colors;
+  }
+
+  .market-btn-yellow {
+    @apply bg-market-yellow text-market-text hover:bg-market-yellow/90 transition-colors;
+  }
+
+  .market-card {
+    @apply border border-market-accent/20 bg-white shadow-sm rounded-md overflow-hidden;
+  }
+}
