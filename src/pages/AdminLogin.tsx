@@ -14,33 +14,42 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuthContext();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    // For demo purposes, we're using a simple check for admin credentials
-    // In a real app, this would be authenticated against a secure backend
-    if (username === 'admin' && password === 'password') {
-      // Simulate network delay
-      setTimeout(() => {
-        // Store admin session in localStorage (not secure, just for demo)
-        localStorage.setItem('adminLoggedIn', 'true');
-        toast.success('Login successful');
+    try {
+      const result = await login({
+        email,
+        password,
+        rememberMe: true,
+      });
+
+      if (result.success) {
+        toast.success('Login successful!');
         navigate('/admin');
-        setLoading(false);
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        toast.error('Invalid credentials');
-        setLoading(false);
-      }, 1000);
+      } else {
+        toast.error(result.message || 'Login failed');
+        if (result.errors) {
+          result.errors.forEach((error) => {
+            toast.error(error.message);
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,13 +69,13 @@ const AdminLogin = () => {
           <form onSubmit={handleLogin}>
             <CardContent className='space-y-4'>
               <div className='space-y-2'>
-                <Label htmlFor='username'>Username</Label>
+                <Label htmlFor='email'>Email</Label>
                 <Input
-                  id='username'
-                  type='text'
-                  placeholder='admin'
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id='email'
+                  type='email'
+                  placeholder='admin@example.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -80,18 +89,10 @@ const AdminLogin = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <p className='text-xs text-muted-foreground text-right'>
-                  For demo: username: admin, password: password
-                </p>
               </div>
             </CardContent>
             <CardFooter>
-              <Button
-                type='submit'
-                className='w-full'
-                disabled={loading}
-                loading={loading}
-              >
+              <Button type='submit' className='w-full' disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
             </CardFooter>

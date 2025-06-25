@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { UserRole } from '../../../lib/auth';
+import { UserRole } from '../../types/auth';
 
 // Props for the ProtectedRoute component
 interface ProtectedRouteProps {

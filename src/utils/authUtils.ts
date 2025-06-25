@@ -1,4 +1,4 @@
-import { UserRole } from '../../lib/auth';
+import { UserRole, Permission, PERMISSIONS } from '../types/auth';
 
 // Frontend User type (excludes sensitive fields)
 export interface User {
@@ -58,16 +58,16 @@ export const hasRole = (user: User | null, requiredRole: UserRole): boolean => {
 };
 
 /**
- * Check if user has a specific permission
+ * Check if user has specific permission
  */
 export const hasPermission = (
   user: User | null,
-  permission: string
+  permission: Permission
 ): boolean => {
   if (!user) return false;
 
-  const userPermissions = CLIENT_PERMISSIONS[user.role as UserRole] || [];
-  return userPermissions.includes(permission);
+  const userPermissions = PERMISSIONS[user.role as UserRole] || [];
+  return (userPermissions as readonly string[]).includes(permission);
 };
 
 /**
@@ -75,7 +75,7 @@ export const hasPermission = (
  */
 export const hasAnyPermission = (
   user: User | null,
-  permissions: string[]
+  permissions: Permission[]
 ): boolean => {
   if (!user) return false;
 
@@ -87,7 +87,7 @@ export const hasAnyPermission = (
  */
 export const hasAllPermissions = (
   user: User | null,
-  permissions: string[]
+  permissions: Permission[]
 ): boolean => {
   if (!user) return false;
 
@@ -97,10 +97,10 @@ export const hasAllPermissions = (
 /**
  * Get all permissions for a user's role
  */
-export const getUserPermissions = (user: User | null): string[] => {
+export const getUserPermissions = (user: User | null): Permission[] => {
   if (!user) return [];
 
-  return [...(CLIENT_PERMISSIONS[user.role as UserRole] || [])];
+  return [...(PERMISSIONS[user.role as UserRole] || [])] as Permission[];
 };
 
 /**

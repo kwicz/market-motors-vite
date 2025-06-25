@@ -1,6 +1,12 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { UserRole } from '../../lib/auth';
+import { UserRole } from '../types/auth';
 
 // Frontend User type (excludes sensitive fields)
 interface User {

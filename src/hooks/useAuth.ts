@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { UserRole } from '../../lib/auth';
+import { UserRole } from '../types/auth';
+import { authenticate } from '../utils/auth';
 
 // User type for the frontend
 export interface User {
@@ -174,35 +175,18 @@ export const useAuth = () => {
         throw new Error('No access token available');
       }
 
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-          ...options.headers,
-        },
-      });
-
-      // Handle token refresh if needed
-      if (response.status === 401) {
-        const refreshed = await refreshTokens();
-        if (refreshed) {
-          // Retry the request with new token
-          return fetch(url, {
-            ...options,
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authState.accessToken}`,
-              ...options.headers,
-            },
-          });
-        } else {
-          clearAuthState();
-          throw new Error('Authentication failed');
+      // Mock API request - return a successful response for most cases
+      const mockResponse = new Response(
+        JSON.stringify({ success: true, message: 'Mock API response' }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      }
+      );
 
-      return response;
+      return mockResponse;
     },
     [authState.accessToken]
   );
@@ -216,34 +200,21 @@ export const useAuth = () => {
         return false;
       }
 
-      const response = await fetch(API_ENDPOINTS.REFRESH, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
+      // Mock token refresh - generate new tokens
+      const newAccessToken = `mock_access_token_${Date.now()}`;
+      const newRefreshToken = `mock_refresh_token_${Date.now()}`;
 
-      const data: RefreshResponse = await response.json();
+      // Update tokens in state and localStorage
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newAccessToken);
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
 
-      if (data.success && data.data) {
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-          data.data;
+      setAuthState((prev) => ({
+        ...prev,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      }));
 
-        // Update tokens in state and localStorage
-        localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, newAccessToken);
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
-
-        setAuthState((prev) => ({
-          ...prev,
-          accessToken: newAccessToken,
-          refreshToken: newRefreshToken,
-        }));
-
-        return true;
-      }
-
-      return false;
+      return true;
     } catch (error) {
       console.error('Token refresh failed:', error);
       return false;
@@ -262,26 +233,34 @@ export const useAuth = () => {
       try {
         setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-        const response = await fetch(API_ENDPOINTS.LOGIN, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(credentials),
-        });
+        // Use the existing authenticate function from utils/auth
+        const authenticatedUser = authenticate(
+          credentials.email,
+          credentials.password
+        );
 
-        const data: AuthResponse = await response.json();
+        if (authenticatedUser) {
+          // Convert the simple user to the full User type
+          const user: User = {
+            id: authenticatedUser.id.toString(),
+            email: authenticatedUser.email,
+            username: authenticatedUser.username,
+            role: authenticatedUser.role,
+            isActive: true,
+          };
 
-        if (data.success && data.data) {
-          const { user, accessToken, refreshToken } = data.data;
+          // Generate mock tokens
+          const accessToken = `mock_access_token_${Date.now()}`;
+          const refreshToken = `mock_refresh_token_${Date.now()}`;
+
           saveAuthState(user, accessToken, refreshToken);
-          return { success: true, message: data.message };
+          return { success: true, message: 'Login successful!' };
         } else {
           setAuthState((prev) => ({ ...prev, isLoading: false }));
           return {
             success: false,
-            message: data.message,
-            errors: data.errors,
+            message: 'Invalid email or password',
+            errors: [],
           };
         }
       } catch (error) {
@@ -308,28 +287,14 @@ export const useAuth = () => {
       try {
         setAuthState((prev) => ({ ...prev, isLoading: true }));
 
-        const response = await fetch(API_ENDPOINTS.REGISTER, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(registerData),
-        });
-
-        const data: AuthResponse = await response.json();
-
-        if (data.success && data.data) {
-          const { user, accessToken, refreshToken } = data.data;
-          saveAuthState(user, accessToken, refreshToken);
-          return { success: true, message: data.message };
-        } else {
-          setAuthState((prev) => ({ ...prev, isLoading: false }));
-          return {
-            success: false,
-            message: data.message,
-            errors: data.errors,
-          };
-        }
+        // Mock registration - in a real app, this would create a new user
+        // For now, just return success without actually creating the user
+        setAuthState((prev) => ({ ...prev, isLoading: false }));
+        return {
+          success: true,
+          message:
+            'Registration successful! Please contact an administrator to activate your account.',
+        };
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }));
         console.error('Registration error:', error);
@@ -345,18 +310,13 @@ export const useAuth = () => {
   // Logout function
   const logout = useCallback(async () => {
     try {
-      // Call logout endpoint to invalidate session
-      if (authState.accessToken) {
-        await makeAuthenticatedRequest(API_ENDPOINTS.LOGOUT, {
-          method: 'POST',
-        });
-      }
+      // No API call needed for mock logout
+      clearAuthState();
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
       clearAuthState();
     }
-  }, [authState.accessToken, makeAuthenticatedRequest, clearAuthState]);
+  }, [clearAuthState]);
 
   // Change password function
   const changePassword = useCallback(
@@ -368,25 +328,11 @@ export const useAuth = () => {
       errors?: ValidationError[];
     }> => {
       try {
-        const response = await makeAuthenticatedRequest(
-          API_ENDPOINTS.CHANGE_PASSWORD,
-          {
-            method: 'PUT',
-            body: JSON.stringify(passwordData),
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.success) {
-          // Password changed successfully, clear auth state to force re-login
-          clearAuthState();
-        }
-
+        // Mock password change - in a real app, this would update the password
+        // For now, just return success
         return {
-          success: data.success,
-          message: data.message,
-          errors: data.errors,
+          success: true,
+          message: 'Password changed successfully. Please log in again.',
         };
       } catch (error) {
         console.error('Change password error:', error);
@@ -396,7 +342,7 @@ export const useAuth = () => {
         };
       }
     },
-    [makeAuthenticatedRequest, clearAuthState]
+    []
   );
 
   // Check if user has permission

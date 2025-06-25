@@ -14,7 +14,7 @@ import {
   AuthGuard,
   GuestGuard,
 } from '../components/auth';
-import { UserRole } from '../../lib/auth';
+import { UserRole } from '../types/auth';
 
 /**
  * Example App Component showing authentication setup

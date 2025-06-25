@@ -1,47 +1,32 @@
-
-import { useState, useEffect, ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import { isSuperAdmin } from '@/utils/auth';
-import { ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { UserRole } from '../../types/auth';
 
 interface SuperAdminRouteProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-const SuperAdminRoute = ({ children }: SuperAdminRouteProps) => {
-  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+const SuperAdminRoute: React.FC<SuperAdminRouteProps> = ({ children }) => {
+  const { user, isLoading } = useAuthContext();
+  const location = useLocation();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const superAdminStatus = isSuperAdmin();
-        setIsAuthorized(superAdminStatus);
-      } catch (error) {
-        console.error('Error checking super admin status:', error);
-        setIsAuthorized(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  if (isAuthorized === null) {
-    // Still loading
+  if (isLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white">
-        <div className="text-center">
-          <ShieldCheck className="w-16 h-16 text-primary mx-auto animate-pulse" />
-          <p className="mt-4 text-lg font-medium">Verifying super admin access...</p>
-        </div>
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+        <span className='ml-2 text-gray-600'>
+          Verifying super admin access...
+        </span>
       </div>
     );
   }
 
-  return isAuthorized ? (
-    <>{children}</>
-  ) : (
-    <Navigate to="/admin" replace />
-  );
+  if (!user || user.role !== UserRole.SUPER_ADMIN) {
+    return <Navigate to='/login' state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
 };
 
 export default SuperAdminRoute;

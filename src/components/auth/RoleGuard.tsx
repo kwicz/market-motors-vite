@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthContext } from '../../contexts/AuthContext';
-import { UserRole } from '../../../lib/auth';
+import { UserRole } from '../../types/auth';
 
 // Props for the RoleGuard component
 interface RoleGuardProps {

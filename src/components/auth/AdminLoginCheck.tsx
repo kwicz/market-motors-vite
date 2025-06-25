@@ -1,31 +1,32 @@
-
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAdminLoggedIn } from '@/utils/auth';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { UserRole } from '../../types/auth';
 
-const AdminLoginCheck = ({ children }: { children: React.ReactNode }) => {
-  const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+interface AdminLoginCheckProps {
+  children: React.ReactNode;
+}
+
+const AdminLoginCheck: React.FC<AdminLoginCheckProps> = ({ children }) => {
+  const { user, isLoading } = useAuthContext();
   const location = useLocation();
 
-  useEffect(() => {
-    // Check if admin is logged in
-    const adminLoggedIn = isAdminLoggedIn();
-    setIsLoggedIn(adminLoggedIn);
-    setLoading(false);
-  }, []);
-
-  if (loading) {
-    // You could show a loading spinner here
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+        <span className='ml-2 text-gray-600'>Verifying admin access...</span>
+      </div>
+    );
   }
 
-  // If not logged in, redirect to login page
-  if (!isLoggedIn) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (
+    !user ||
+    (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN)
+  ) {
+    return <Navigate to='/login' state={{ from: location }} replace />;
   }
 
-  // If logged in, render children
   return <>{children}</>;
 };
 

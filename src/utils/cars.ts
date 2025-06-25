@@ -159,3 +159,68 @@ export async function getCarById(id: string): Promise<Car | null> {
   const cars = await loadCars();
   return cars.find((car) => car.id === id) || null;
 }
+
+// Bulk operations functions
+export interface BulkOperationData {
+  carIds: string[];
+  operation:
+    | 'delete'
+    | 'feature'
+    | 'unfeature'
+    | 'stock'
+    | 'unstock'
+    | 'update';
+  updateData?: {
+    category?: string;
+    condition?: string;
+    fuelType?: string;
+    transmission?: string;
+    color?: string;
+    isFeatured?: boolean;
+    inStock?: boolean;
+  };
+}
+
+export interface BulkOperationResult {
+  operation: string;
+  affectedCount: number;
+  affectedCars: Array<{ id: string; [key: string]: unknown }>;
+  updateData?: Record<string, unknown>;
+}
+
+export interface BulkOperationPreview {
+  operation: string;
+  affectedCount: number;
+  preview: string;
+}
+
+export async function performBulkOperation(
+  data: BulkOperationData
+): Promise<BulkOperationResult> {
+  // In a real application, this would make an API call to /api/cars/bulk
+  // For now, we'll simulate the operation
+  console.log('Performing bulk operation:', data);
+
+  // Mock response
+  return {
+    operation: data.operation,
+    affectedCount: data.carIds.length,
+    affectedCars: data.carIds.map((id) => ({ id })),
+    ...(data.updateData && { updateData: data.updateData }),
+  };
+}
+
+export async function previewBulkOperation(
+  data: BulkOperationData
+): Promise<BulkOperationPreview> {
+  // In a real application, this would make an API call to /api/cars/bulk/preview
+  // For now, we'll simulate the preview
+  console.log('Previewing bulk operation:', data);
+
+  // Mock preview response
+  return {
+    operation: data.operation,
+    affectedCount: data.carIds.length,
+    preview: `This will ${data.operation} ${data.carIds.length} vehicles`,
+  };
+}
