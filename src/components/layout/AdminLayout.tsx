@@ -20,6 +20,7 @@ import {
 import { UserRole } from '../../types/auth';
 import { logout } from '@/utils/auth';
 import { toast } from 'sonner';
+import { siteConfig } from '@/siteConfig';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -119,7 +120,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className='flex h-screen bg-gray-50'>
+    <div className='AdminLayout flex h-screen bg-gray-50'>
       {/* Sidebar */}
       <div
         className={`
@@ -132,10 +133,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           {/* Logo/Header */}
           <div className='flex items-center justify-between px-6 py-4 border-b'>
             <Link to='/' className='flex items-center space-x-2'>
-              <Car className='h-8 w-8 text-primary' />
-              <span className='text-xl font-bold text-gray-900'>
-                Market Motors
-              </span>
+              <img
+                src={siteConfig.styles.logos.bigLogo}
+                alt={siteConfig.siteName + ' logo'}
+                className='h-8 w-auto mr-2'
+                style={{ maxHeight: 32 }}
+              />
             </Link>
             <Button
               variant='ghost'

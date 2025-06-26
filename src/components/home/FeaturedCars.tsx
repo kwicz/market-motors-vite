@@ -36,7 +36,7 @@ const FeaturedCars = () => {
   }, []);
 
   return (
-    <section className='py-20 bg-gray-50'>
+    <section className={['FeaturedCars', 'py-20 bg-gray-50'].join(' ')}>
       <div className='container mx-auto px-4'>
         <div className='flex flex-wrap items-end justify-between mb-12'>
           <div className='w-full lg:w-1/2 mb-6 lg:mb-0'>

@@ -624,7 +624,7 @@ const AdminInventory: React.FC = () => {
                             >
                               {car.condition}
                             </Badge>
-                            <Badge variant='outline'>{car.category}</Badge>
+                            <Badge variant='vehicle'>{car.category}</Badge>
                             {car.inStock ? (
                               <div className='flex items-center text-green-600 text-sm'>
                                 <CheckCircle className='h-4 w-4 mr-1' />

@@ -2,43 +2,20 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { HeroImage } from '@/components/ui/OptimizedImage';
-
-const slides = [
-  {
-    id: 1,
-    image:
-      'https://images.unsplash.com/photo-1559416523-140ddc3d238c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-    title: 'Find Your Perfect Vehicle',
-    subtitle:
-      'Discover quality pre-owned cars with confidence and peace of mind.',
-  },
-  {
-    id: 2,
-    image:
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-    title: 'Quality You Can Trust',
-    subtitle:
-      'Every vehicle is thoroughly inspected and comes with our warranty.',
-  },
-  {
-    id: 3,
-    image:
-      'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
-    title: 'Competitive Financing',
-    subtitle: 'Get pre-approved with competitive rates and flexible terms.',
-  },
-];
+import { siteConfig } from '@/siteConfig';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(
-    slides.map(() => false)
+    siteConfig.heroSlides.map(() => false)
   );
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+      setCurrentSlide(
+        (prevSlide) => (prevSlide + 1) % siteConfig.heroSlides.length
+      );
     }, 6000);
 
     return () => clearInterval(timer);
@@ -66,7 +43,12 @@ const Hero = () => {
   };
 
   return (
-    <section className='relative h-screen min-h-[600px] overflow-hidden'>
+    <section
+      className={[
+        'Hero',
+        'relative h-screen min-h-[600px] overflow-hidden',
+      ].join(' ')}
+    >
       {/* Loading overlay */}
       {loading && (
         <div className='absolute inset-0 bg-market-background flex items-center justify-center z-10'>
@@ -75,9 +57,9 @@ const Hero = () => {
       )}
 
       {/* Slides */}
-      {slides.map((slide, index) => (
+      {siteConfig.heroSlides.map((slide, index) => (
         <div
-          key={slide.id}
+          key={index}
           className={`absolute inset-0 transition-opacity duration-1000 ${
             currentSlide === index ? 'opacity-100' : 'opacity-0'
           }`}
@@ -86,7 +68,7 @@ const Hero = () => {
             src={slide.image}
             alt={slide.title}
             className='w-full h-full'
-            priority={index === 0} // Prioritize first slide
+            priority={index === 0}
             onLoad={() => handleImageLoad(index)}
           />
           <div className='absolute inset-0 bg-gradient-to-r from-market-text/60 to-market-text/30' />
@@ -97,21 +79,21 @@ const Hero = () => {
       <div className='absolute inset-0 flex flex-col justify-center items-start px-4 sm:px-6 lg:px-8 container mx-auto'>
         <div className='max-w-xl'>
           <span className='inline-block py-1 px-3 bg-market-yellow text-market-text rounded-full text-sm font-medium mb-4 animate-fade-in'>
-            Welcome to Market Motors
+            {`Welcome to ${siteConfig.siteName}`}
           </span>
 
           <h1
             className='text-4xl md:text-5xl lg:text-6xl font-clarendon text-white mb-4 leading-tight animate-fade-in'
             style={{ animationDelay: '200ms' }}
           >
-            {slides[currentSlide].title}
+            {siteConfig.heroSlides[currentSlide].title}
           </h1>
 
           <p
             className='text-xl text-white/90 mb-8 animate-fade-in'
             style={{ animationDelay: '400ms' }}
           >
-            {slides[currentSlide].subtitle}
+            {siteConfig.heroSlides[currentSlide].subtitle}
           </p>
 
           <div
@@ -140,7 +122,7 @@ const Hero = () => {
 
       {/* Slide indicators */}
       <div className='absolute bottom-8 left-0 right-0 flex justify-center space-x-2'>
-        {slides.map((_, index) => (
+        {siteConfig.heroSlides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}

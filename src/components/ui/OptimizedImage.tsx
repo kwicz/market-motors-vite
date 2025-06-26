@@ -125,6 +125,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       srcSet={srcSet}
       sizes={sizesAttr}
       className={cn(
+        'OptimizedImage',
         aspectRatioClass,
         blur && 'blur-sm hover:blur-none transition-all duration-300',
         className

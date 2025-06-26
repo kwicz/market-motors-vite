@@ -839,9 +839,7 @@ const EditVehicle: React.FC = () => {
                       <h3 className='font-medium'>
                         Uploaded Images ({uploadedImages.length}/10)
                       </h3>
-                      <Badge variant='outline'>
-                        Thumbnail: Image {thumbnailIndex + 1}
-                      </Badge>
+                      <Badge variant='vehicle'>{carData.category}</Badge>
                     </div>
                     <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
                       {uploadedImages.map((image, index) => (

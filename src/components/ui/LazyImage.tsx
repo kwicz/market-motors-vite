@@ -110,7 +110,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   return (
     <div
       ref={imgRef}
-      className={cn('relative overflow-hidden', className)}
+      className={cn('LazyImage', 'relative overflow-hidden', className)}
       {...props}
     >
       {/* Placeholder */}

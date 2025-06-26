@@ -53,6 +53,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
+          'Button',
           buttonVariants({ variant, size }),
           loading && 'opacity-80 pointer-events-none relative',
           // Add flex and gap for all buttons except icon-only
