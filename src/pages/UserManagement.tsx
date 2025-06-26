@@ -358,7 +358,7 @@ const UserManagement: React.FC = () => {
       <div className='container mx-auto px-4 py-8'>
         <Card>
           <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
+            <CardTitle className='flex items-center gap-2 text-xl font-semibold leading-none tracking-tight'>
               <Shield className='h-5 w-5' />
               Access Denied
             </CardTitle>
@@ -504,7 +504,7 @@ const UserManagement: React.FC = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
+                  <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                     Total Users
                   </CardTitle>
                   <Users className='h-4 w-4 text-muted-foreground' />
@@ -520,7 +520,7 @@ const UserManagement: React.FC = () => {
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
+                  <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                     Active Users
                   </CardTitle>
                   <Activity className='h-4 w-4 text-muted-foreground' />
@@ -540,7 +540,7 @@ const UserManagement: React.FC = () => {
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
+                  <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                     Administrators
                   </CardTitle>
                   <Shield className='h-4 w-4 text-muted-foreground' />
@@ -556,7 +556,7 @@ const UserManagement: React.FC = () => {
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
+                  <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                     Super Admins
                   </CardTitle>
                   <UserPlus className='h-4 w-4 text-muted-foreground' />
@@ -576,7 +576,9 @@ const UserManagement: React.FC = () => {
           {/* Filters and Search */}
           <Card>
             <CardHeader>
-              <CardTitle>User Accounts</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                User Accounts
+              </CardTitle>
               <CardDescription>
                 Manage user accounts, roles, and permissions
               </CardDescription>
@@ -717,7 +719,7 @@ const UserManagement: React.FC = () => {
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant='ghost' className='h-8 w-8 p-0'>
-                                  <MoreHorizontal className='h-4 w-4' />
+                                  <MoreHorizontal className='w-full h-4' />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='end'>

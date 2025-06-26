@@ -19,8 +19,15 @@ const Index = () => {
         <FeaturedCars />
 
         {/* About/Why Choose Us Section */}
-        <section className='py-20 bg-market-background' id='about'>
-          <div className='container mx-auto px-4'>
+        <section className='bg-market-background' id='about'>
+          <div className='w-full'>
+            <img
+              src='/banner.jpg'
+              alt='Market Motors Banner'
+              className='w-full h-56 md:h-80 object-cover'
+            />
+          </div>
+          <div className='container mx-auto px-4 py-20'>
             <div>
               <span className='inline-block text-sm font-medium text-market-accent mb-2'>
                 {siteConfig.about.sectionLabel}

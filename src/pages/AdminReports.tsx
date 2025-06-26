@@ -100,7 +100,7 @@ const AdminReports = () => {
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
+                <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                   Total Vehicles
                 </CardTitle>
                 <Car className='h-4 w-4 text-muted-foreground' />
@@ -116,7 +116,7 @@ const AdminReports = () => {
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
+                <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                   Vehicles Sold
                 </CardTitle>
                 <TrendingUp className='h-4 w-4 text-muted-foreground' />
@@ -130,7 +130,7 @@ const AdminReports = () => {
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
+                <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                   Total Revenue
                 </CardTitle>
                 <DollarSign className='h-4 w-4 text-muted-foreground' />
@@ -146,7 +146,7 @@ const AdminReports = () => {
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className='text-sm font-medium'>
+                <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                   Active Users
                 </CardTitle>
                 <Users className='h-4 w-4 text-muted-foreground' />
@@ -163,7 +163,7 @@ const AdminReports = () => {
           {/* Report Generation */}
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight flex items-center gap-2'>
                 <FileText className='h-5 w-5' />
                 Generate Custom Report
               </CardTitle>
@@ -236,7 +236,9 @@ const AdminReports = () => {
           {/* Report Tabs */}
           <Card>
             <CardHeader>
-              <CardTitle>Analytics Dashboard</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                Analytics Dashboard
+              </CardTitle>
               <CardDescription>
                 View detailed analytics and performance metrics
               </CardDescription>
@@ -254,7 +256,9 @@ const AdminReports = () => {
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>Monthly Sales</CardTitle>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                          Monthly Sales
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className='text-2xl font-bold text-green-600'>
@@ -270,7 +274,7 @@ const AdminReports = () => {
                     </Card>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                           Top Performing Model
                         </CardTitle>
                       </CardHeader>
@@ -293,7 +297,7 @@ const AdminReports = () => {
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                           Inventory Status
                         </CardTitle>
                       </CardHeader>
@@ -322,7 +326,7 @@ const AdminReports = () => {
                     </Card>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                           Popular Categories
                         </CardTitle>
                       </CardHeader>
@@ -350,7 +354,9 @@ const AdminReports = () => {
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>User Activity</CardTitle>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                          User Activity
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className='text-2xl font-bold'>
@@ -367,7 +373,7 @@ const AdminReports = () => {
                     </Card>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                           User Engagement
                         </CardTitle>
                       </CardHeader>
@@ -395,7 +401,7 @@ const AdminReports = () => {
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                           System Performance
                         </CardTitle>
                       </CardHeader>
@@ -418,7 +424,7 @@ const AdminReports = () => {
                     </Card>
                     <Card>
                       <CardHeader>
-                        <CardTitle className='text-lg'>
+                        <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                           Recent Activity
                         </CardTitle>
                       </CardHeader>

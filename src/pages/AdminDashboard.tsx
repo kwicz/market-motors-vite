@@ -253,14 +253,17 @@ const AdminDashboard: React.FC = () => {
             <select
               value={selectedPeriod}
               onChange={handleSelectPeriod}
-              className='px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary'
+              className='px-[12px] py-[12px] border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary'
             >
               <option value='day'>Today</option>
               <option value='week'>This Week</option>
               <option value='month'>This Month</option>
               <option value='year'>This Year</option>
             </select>
-            <Button onClick={() => navigate('/admin/add-vehicle')}>
+            <Button
+              className='font-inter'
+              onClick={() => navigate('/admin/add-vehicle')}
+            >
               <Plus className='h-4 w-4 mr-2' />
               Add Vehicle
             </Button>
@@ -271,7 +274,7 @@ const AdminDashboard: React.FC = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
                 Total Vehicles
               </CardTitle>
               <Car className='h-4 w-4 text-muted-foreground' />
@@ -300,7 +303,9 @@ const AdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Total Value</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                Total Value
+              </CardTitle>
               <DollarSign className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
@@ -317,7 +322,9 @@ const AdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>In Stock</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                In Stock
+              </CardTitle>
               <Package className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
@@ -334,7 +341,9 @@ const AdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>Featured</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                Featured
+              </CardTitle>
               <Star className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
@@ -354,7 +363,9 @@ const AdminDashboard: React.FC = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           <Card>
             <CardHeader>
-              <CardTitle className='text-lg'>Recent Additions</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                Recent Additions
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className='text-3xl font-bold text-blue-600'>
@@ -383,7 +394,9 @@ const AdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className='text-lg'>Average Mileage</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                Average Mileage
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className='text-3xl font-bold'>
@@ -399,7 +412,9 @@ const AdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className='text-lg'>Average Year</CardTitle>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight'>
+                Average Year
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className='text-3xl font-bold'>
@@ -418,7 +433,7 @@ const AdminDashboard: React.FC = () => {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center'>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight flex items-center'>
                 <BarChart3 className='h-5 w-5 mr-2' />
                 Category Distribution
               </CardTitle>
@@ -462,7 +477,7 @@ const AdminDashboard: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center'>
+              <CardTitle className='text-xl font-semibold leading-none tracking-tight flex items-center'>
                 <Users className='h-5 w-5 mr-2' />
                 Top Makes
               </CardTitle>
@@ -497,16 +512,16 @@ const AdminDashboard: React.FC = () => {
         {/* Recent Activity */}
         <Card>
           <CardHeader>
-            <CardTitle className='flex items-center justify-between'>
+            <CardTitle className='flex items-center justify-between text-xl font-semibold leading-none tracking-tight'>
               <div className='flex items-center'>
                 <Activity className='h-5 w-5 mr-2' />
                 Recent Activity
               </div>
               <Button
-                variant='outline'
-                size='sm'
+                className='font-inter'
                 onClick={() => navigate('/admin/inventory')}
               >
+                <Activity className='h-4 w-4 mr-2' />
                 View All
               </Button>
             </CardTitle>

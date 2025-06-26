@@ -49,6 +49,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/contexts/AuthContext';
+import CameraCapture from '@/components/ui/CameraCapture';
 
 // Form validation schema
 const addVehicleSchema = z.object({
@@ -178,6 +179,24 @@ interface UploadApiResponse {
   message?: string;
 }
 
+// Utility to convert base64 data URL to File
+function base64ToFile(dataUrl: string, filename: string): File {
+  const arr = dataUrl.split(',');
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+  if (!arr[1]) throw new Error('Invalid base64 image data');
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
+const MAX_IMAGE_SIZE_MB = 10;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 const AddVehicle: React.FC = () => {
   const navigate = useNavigate();
   const { makeAuthenticatedRequest } = useAuthContext();
@@ -186,6 +205,7 @@ const AddVehicle: React.FC = () => {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [newFeature, setNewFeature] = useState('');
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
+  const [cameraModalOpen, setCameraModalOpen] = useState(false);
 
   const form = useForm<AddVehicleFormData>({
     resolver: zodResolver(addVehicleSchema),
@@ -217,10 +237,34 @@ const AddVehicle: React.FC = () => {
   const handleFileUpload = async (files: FileList) => {
     if (files.length === 0) return;
 
+    // Validate files before uploading
+    const validFiles: File[] = [];
+    Array.from(files).forEach((file) => {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        toast.error(
+          `${
+            file.name || 'Image'
+          }: Invalid file type. Only JPEG, PNG, and WebP are allowed.`
+        );
+        return;
+      }
+      if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+        toast.error(
+          `${
+            file.name || 'Image'
+          }: File size exceeds ${MAX_IMAGE_SIZE_MB}MB limit.`
+        );
+        return;
+      }
+      validFiles.push(file);
+    });
+
+    if (validFiles.length === 0) return;
+
     setUploadingImages(true);
     try {
       const formData = new FormData();
-      Array.from(files).forEach((file) => {
+      validFiles.forEach((file) => {
         formData.append('images', file);
       });
 
@@ -833,10 +877,7 @@ const AddVehicle: React.FC = () => {
                           type='button'
                           variant='outline'
                           disabled={uploadingImages}
-                          onClick={() => {
-                            // Camera capture functionality would go here
-                            toast.info('Camera capture feature coming soon!');
-                          }}
+                          onClick={() => setCameraModalOpen(true)}
                         >
                           <Camera className='h-4 w-4 mr-2' />
                           Take Photo
@@ -984,6 +1025,19 @@ const AddVehicle: React.FC = () => {
           </form>
         </Form>
       </div>
+      <CameraCapture
+        open={cameraModalOpen}
+        onOpenChange={setCameraModalOpen}
+        onCapture={async (image) => {
+          // Convert base64 to File and upload
+          const file = base64ToFile(image, `captured-${Date.now()}.jpg`);
+          await handleFileUpload({
+            0: file,
+            length: 1,
+            item: (i: number) => file,
+          } as unknown as FileList);
+        }}
+      />
     </AdminLayout>
   );
 };

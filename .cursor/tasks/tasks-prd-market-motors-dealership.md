@@ -143,33 +143,46 @@ Based on PRD: `prd-market-motors-dealership.md`
 - ✅ **5.11** Implement image upload with device camera support and file selection
 - ✅ **5.12** Add form validation with real-time feedback using React Hook Form and Zod schemas
 
-## 6.0 State Management & API Integration
+## 6.0 Camera & Image Capture Functionality
 
-- [x] **6.1** - Set up TanStack Query with proper configuration
-- [x] **6.2** - Create API client utilities with interceptors
-- [x] **6.3** - Implement authentication state management
-- [x] **6.4** - Create custom hooks for data fetching
-- [x] **6.5** - Implement optimistic updates for better user experience
-- [x] **6.6** - Add loading states and error handling for all data fetching
-- [x] **6.7** - Implement data caching strategies
-- [x] **6.8** - Add offline support with cache persistence
-- [x] **6.9** - Create background sync for data updates
-- [x] **6.10** - Implement local storage utilities for user preferences
-- [x] **6.11** - Add debounced search and filter hooks
+- [x] **6.1** Research and select a React camera/capture library (e.g., `react-webcam` or `expo-camera` for React Native) _(Selected and installed `react-webcam`)_
+- [x] **6.2** Create a reusable `CameraCapture` component that allows users to take a photo using their device camera _(Created modal in src/components/ui/CameraCapture.tsx)_
+- [x] **6.3** Integrate the `CameraCapture` component into the car add/edit forms and any relevant user profile forms _(Integrated into Add Vehicle form)_
+- [x] **6.4** Allow users to preview the captured image before uploading _(CameraCapture modal provides preview before upload)_
+- [x] **6.5** Add option to retake or remove the photo before submission _(CameraCapture modal allows retake; form allows removing images before submission)_
+- [x] **6.6** Convert the captured image to a suitable format (e.g., base64 or Blob) for upload _(CameraCapture returns base64 image suitable for upload)_
+- [x] **6.7** Update the image upload API endpoint to accept images from the camera as well as file selection _(Camera images are converted to File and uploaded via the existing API)_
+- [x] **6.8** Add frontend validation for image size and type _(Validation for file size and type is enforced for both file and camera uploads)_
+- [x] **6.9** Display upload progress and success/error messages to the user _(Spinner and toast messages are shown for upload progress, success, and errors)_
+- [x] **6.10** Write unit tests for the `CameraCapture` component and image upload logic _(Basic test suite implemented in src/components/ui/**tests**/CameraCapture.test.tsx)_
 
-## 7.0 Testing, Optimization, and Deployment
+## 7.0 State Management & API Integration
 
-- ✅ **7.1** Write unit tests for React components with React Testing Library and Vitest
-- ✅ **7.2** Create integration tests for API endpoints with supertest and Vitest
-- ✅ **7.3** Implement end-to-end tests for critical user flows with Playwright
-- ✅ **7.4** Add database query tests and schema validation tests with Drizzle
-- ✅ **7.5** Optimize images for web delivery and implement lazy loading in Vite
-<!-- - [ ] **7.6** Implement performance monitoring and Core Web Vitals optimization for Vite build
-- [ ] **7.7** Set up error tracking and logging system (frontend with Sentry, backend with Winston) -->
-- [ ] **7.8** Configure production environment variables and secrets management
-- [ ] **7.9** Prepare Railway deployment configuration for Vite frontend and Express.js backend
-- [ ] **7.10** Implement database backup and migration strategies with Drizzle
-- [ ] **7.11** Conduct security audit and implement security best practices
-- [ ] **7.12** Deploy to Railway platform and verify all functionality works in production
-- [ ] **7.13** Set up Vite build optimization and asset bundling for production
-- [ ] **7.14** Configure Express.js to serve Vite build files in production
+- [x] **7.1** - Set up TanStack Query with proper configuration
+- [x] **7.2** - Create API client utilities with interceptors
+- [x] **7.3** - Implement authentication state management
+- [x] **7.4** - Create custom hooks for data fetching
+- [x] **7.5** - Implement optimistic updates for better user experience
+- [x] **7.6** - Add loading states and error handling for all data fetching
+- [x] **7.7** - Implement data caching strategies
+- [x] **7.8** - Add offline support with cache persistence
+- [x] **7.9** - Create background sync for data updates
+- [x] **7.10** - Implement local storage utilities for user preferences
+- [x] **7.11** - Add debounced search and filter hooks
+
+## 8.0 Testing, Optimization, and Deployment
+
+- ✅ **8.1** Write unit tests for React components with React Testing Library and Vitest
+- ✅ **8.2** Create integration tests for API endpoints with supertest and Vitest
+- ✅ **8.3** Implement end-to-end tests for critical user flows with Playwright
+- ✅ **8.4** Add database query tests and schema validation tests with Drizzle
+- ✅ **8.5** Optimize images for web delivery and implement lazy loading in Vite
+<!-- - [ ] **8.6** Implement performance monitoring and Core Web Vitals optimization for Vite build
+- [ ] **8.7** Set up error tracking and logging system (frontend with Sentry, backend with Winston) -->
+- [ ] **8.8** Configure production environment variables and secrets management
+- [ ] **8.9** Prepare Railway deployment configuration for Vite frontend and Express.js backend
+- [ ] **8.10** Implement database backup and migration strategies with Drizzle
+- [ ] **8.11** Conduct security audit and implement security best practices
+- [ ] **8.12** Deploy to Railway platform and verify all functionality works in production
+- [ ] **8.13** Set up Vite build optimization and asset bundling for production
+- [ ] **8.14** Configure Express.js to serve Vite build files in production

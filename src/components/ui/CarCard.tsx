@@ -78,9 +78,17 @@ export function CarCard({
         </div>
       </CardContent>
 
-      <CardFooter className='p-4 pt-0 flex gap-2'>
-        <Link to={`/car/${car.id}`} className='flex-1'>
-          <Button className='w-full'>View Details</Button>
+      <CardFooter
+        className={cn(
+          'p-4 pt-0 gap-2',
+          showActions ? 'flex' : 'flex justify-center'
+        )}
+      >
+        <Link
+          to={`/car/${car.id}`}
+          className={showActions ? 'flex-1' : 'w-full max-w-xs'}
+        >
+          <Button className='w-full justify-center'>View Details</Button>
         </Link>
 
         {showActions && (

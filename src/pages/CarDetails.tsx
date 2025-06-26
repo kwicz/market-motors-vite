@@ -7,6 +7,8 @@ import { getCarById } from '@/utils/cars';
 import { Car } from '@/utils/types';
 import { CarDetailImage } from '@/components/ui/OptimizedImage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CarThumbnail } from '@/components/ui/OptimizedImage';
+import { siteConfig } from '@/siteConfig';
 
 const CarDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -174,6 +176,31 @@ const CarDetails = () => {
                 />
               </div>
 
+              {/* Thumbnails Row */}
+              {car.images.length > 1 && (
+                <div className='flex items-center justify-center gap-2 mt-4 overflow-x-auto pb-2'>
+                  {car.images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`border rounded-md focus:outline-none transition-all duration-150 ${
+                        idx === currentImageIndex
+                          ? 'ring-2 ring-primary border-primary'
+                          : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                      style={{ minWidth: 64, minHeight: 40 }}
+                      aria-label={`Show image ${idx + 1}`}
+                    >
+                      <CarThumbnail
+                        src={img}
+                        alt={`${car.make} ${car.model} - Thumbnail ${idx + 1}`}
+                        className='object-cover w-16 h-10 rounded-md'
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Navigation Buttons */}
               {car.images.length > 1 && (
                 <>
@@ -319,31 +346,16 @@ const CarDetails = () => {
               {/* Right column - Contact/CTA */}
               <div className='lg:col-span-1'>
                 <div className='bg-white rounded-lg shadow-sm p-6 mb-6 sticky top-24'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Interested in this vehicle?
+                  <h2 className='text-xl font-semibold mb-4 text-center'>
+                    Interested in this vehicle? <br />
+                    Contact us directly
                   </h2>
-                  <div className='space-y-4 mb-6'>
-                    <Button className='w-full'>Schedule Test Drive</Button>
-                    <Link to='/inventory'>
-                      <Button variant='outline' className='w-full'>
-                        Browse More Vehicles
-                      </Button>
-                    </Link>
-                    <a href='mailto:info@marketmotors.com'>
-                      <Button variant='subtle' className='w-full'>
-                        Contact Us
-                      </Button>
-                    </a>
-                  </div>
                   <div className='border-t pt-4'>
-                    <p className='text-center text-muted-foreground mb-4'>
-                      Have questions? Contact us directly
-                    </p>
                     <a
-                      href='tel:+15551234567'
+                      href={siteConfig.contact.phoneHref}
                       className='flex items-center justify-center font-semibold text-lg hover:text-primary transition-colors'
                     >
-                      (555) 123-4567
+                      {siteConfig.contact.phone}
                     </a>
                   </div>
                 </div>

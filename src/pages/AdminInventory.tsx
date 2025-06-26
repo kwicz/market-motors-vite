@@ -310,7 +310,12 @@ const AdminInventory: React.FC = () => {
                 />
               </div>
               <div className='flex items-center space-x-2'>
-                <Button variant='outline' size='sm' onClick={handleSelectAll}>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={handleSelectAll}
+                  className='h-10'
+                >
                   {selectedCars.length === filteredCars.length
                     ? 'Deselect All'
                     : 'Select All'}

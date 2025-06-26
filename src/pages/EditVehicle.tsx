@@ -42,6 +42,7 @@ import {
   ImageIcon,
 } from 'lucide-react';
 import { carCreationSchema } from '@lib/validations/vehicle';
+import CameraCapture from '@/components/ui/CameraCapture';
 
 // Types for image handling
 interface UploadedImage {
@@ -95,6 +96,24 @@ const CATEGORIES = [
   'Electric',
 ] as const;
 
+// Utility to convert base64 data URL to File
+function base64ToFile(dataUrl: string, filename: string): File {
+  const arr = dataUrl.split(',');
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+  if (!arr[1]) throw new Error('Invalid base64 image data');
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
+const MAX_IMAGE_SIZE_MB = 10;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 const EditVehicle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -105,7 +124,8 @@ const EditVehicle: React.FC = () => {
   const [newFeature, setNewFeature] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [carData, setCarData] = useState(null);
+  const [carData, setCarData] = useState<FormData | null>(null);
+  const [cameraModalOpen, setCameraModalOpen] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(carCreationSchema),
@@ -211,66 +231,81 @@ const EditVehicle: React.FC = () => {
 
   const handleFileUpload = async (files: FileList) => {
     if (files.length === 0) return;
-
-    const maxFiles = 10 - uploadedImages.length;
-    const filesToUpload = Array.from(files).slice(0, maxFiles);
-
-    if (filesToUpload.length < files.length) {
-      toast.warning(
-        `Only ${maxFiles} more images can be uploaded (max 10 total)`
-      );
-    }
-
+    // Validate files before uploading
+    const validFiles: File[] = [];
+    Array.from(files).forEach((file) => {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        toast.error(
+          `${
+            file.name || 'Image'
+          }: Invalid file type. Only JPEG, PNG, and WebP are allowed.`
+        );
+        return;
+      }
+      if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+        toast.error(
+          `${
+            file.name || 'Image'
+          }: File size exceeds ${MAX_IMAGE_SIZE_MB}MB limit.`
+        );
+        return;
+      }
+      validFiles.push(file);
+    });
+    if (validFiles.length === 0) return;
     setIsUploading(true);
-
     try {
       const formData = new FormData();
-      filesToUpload.forEach((file) => {
+      validFiles.forEach((file) => {
         formData.append('images', file);
       });
-
+      // Set image processing options
+      formData.append('quality', '85');
+      formData.append('format', 'jpeg');
+      formData.append('resize', 'true');
+      formData.append('width', '800');
+      formData.append('height', '600');
       const response = await fetch('/api/upload/multiple', {
         method: 'POST',
-        body: formData,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
         },
+        body: formData,
       });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const result: UploadApiResponse = await response.json();
-
-      if (result.success && result.images) {
-        const newImages: UploadedImage[] = result.images.map(
-          (img: ImageUploadResponse) => ({
-            url: img.url,
-            filename: img.filename,
-            originalName: img.originalName,
-            size: img.size,
-          })
-        );
-
-        const updatedImages = [...uploadedImages, ...newImages];
-        setUploadedImages(updatedImages);
-
-        // Update form with new image URLs
-        const imageUrls = updatedImages.map((img) => img.url);
-        form.setValue('images', imageUrls);
-
-        // Set thumbnail if this is the first image
-        if (uploadedImages.length === 0 && newImages.length > 0) {
-          form.setValue('thumbnail', newImages[0].url);
-          setThumbnailIndex(0);
+      if (response.ok) {
+        const result: UploadApiResponse = await response.json();
+        if (result.success) {
+          const newImages: UploadedImage[] = result.images.map(
+            (img: ImageUploadResponse) => ({
+              url: img.dataURL,
+              filename: img.filename,
+              originalName: img.originalName,
+              size: img.size,
+            })
+          );
+          setUploadedImages((prev) => [...prev, ...newImages]);
+          // Update form values
+          const currentImages = form.getValues('images');
+          const updatedImages = [
+            ...currentImages,
+            ...newImages.map((img) => img.url),
+          ];
+          form.setValue('images', updatedImages);
+          // Set first image as thumbnail if none set
+          if (!form.getValues('thumbnail') && updatedImages.length > 0) {
+            form.setValue('thumbnail', updatedImages[0]);
+            setThumbnailIndex(0);
+          }
+          toast.success(`${newImages.length} image(s) uploaded successfully`);
+        } else {
+          throw new Error(result.message || 'Upload failed');
         }
-
-        toast.success(`${newImages.length} image(s) uploaded successfully`);
+      } else {
+        throw new Error('Upload failed');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Failed to upload images');
+      toast.error('Failed to upload images. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -812,9 +847,14 @@ const EditVehicle: React.FC = () => {
                         )}
                         Select Images
                       </Button>
-                      <Button type='button' variant='outline' disabled>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        disabled={isUploading}
+                        onClick={() => setCameraModalOpen(true)}
+                      >
                         <Camera className='h-4 w-4 mr-2' />
-                        Camera (Coming Soon)
+                        Take Photo
                       </Button>
                     </div>
                   </div>
@@ -839,7 +879,9 @@ const EditVehicle: React.FC = () => {
                       <h3 className='font-medium'>
                         Uploaded Images ({uploadedImages.length}/10)
                       </h3>
-                      <Badge variant='vehicle'>{carData.category}</Badge>
+                      {carData && (
+                        <Badge variant='vehicle'>{carData.category}</Badge>
+                      )}
                     </div>
                     <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
                       {uploadedImages.map((image, index) => (
@@ -969,6 +1011,18 @@ const EditVehicle: React.FC = () => {
           </form>
         </Form>
       </div>
+      <CameraCapture
+        open={cameraModalOpen}
+        onOpenChange={setCameraModalOpen}
+        onCapture={async (image) => {
+          const file = base64ToFile(image, `captured-${Date.now()}.jpg`);
+          await handleFileUpload({
+            0: file,
+            length: 1,
+            item: (i: number) => file,
+          } as unknown as FileList);
+        }}
+      />
     </AdminLayout>
   );
 };

@@ -122,7 +122,9 @@ const InventoryResults = ({
             We couldn't find any vehicles matching your current filters. Try
             adjusting your search criteria.
           </p>
-          <Button onClick={onResetAllFilters}>Reset Filters</Button>
+          <div className='flex justify-center'>
+            <Button onClick={onResetAllFilters}>Reset Filters</Button>
+          </div>
         </div>
       )}
     </div>
