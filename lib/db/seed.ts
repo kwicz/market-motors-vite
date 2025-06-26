@@ -1,155 +1,219 @@
-import { db } from './index';
-import { users } from './schema';
-import { AuthUtils, UserRole } from '../auth';
-import { eq } from 'drizzle-orm';
+import { config } from 'dotenv';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { hash } from 'bcryptjs';
+import { createId } from '@paralleldrive/cuid2';
 
-// Default super admin user configuration
-const DEFAULT_SUPER_ADMIN = {
-  email: 'admin@marketmotors.com',
-  password: 'SuperAdmin123!',
-  username: 'superadmin',
-  role: UserRole.SUPER_ADMIN as const,
+// Load environment variables
+config();
+
+// Import database schema
+import * as schema from './schema';
+
+// Database connection
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
+const client = postgres(connectionString);
+const db = drizzle(client, { schema });
+
+// Seed data
+const seedData = {
+  users: [
+    {
+      id: createId(),
+      email: 'admin@marketmotors.com',
+      username: 'admin',
+      password: 'Admin123!',
+      role: 'admin' as const,
+      isActive: true,
+    },
+    {
+      id: createId(),
+      email: 'dealer@marketmotors.com',
+      username: 'dealer',
+      password: 'Dealer123!',
+      role: 'admin' as const,
+      isActive: true,
+    },
+    {
+      id: createId(),
+      email: 'customer@example.com',
+      username: 'customer',
+      password: 'Customer123!',
+      role: 'user' as const,
+      isActive: true,
+    },
+  ],
+
+  vehicles: [
+    {
+      id: createId(),
+      make: 'Toyota',
+      model: 'Camry',
+      year: 2023,
+      price: '28500',
+      mileage: 15000,
+      color: 'Silver',
+      fuelType: 'gasoline',
+      transmission: 'automatic',
+      condition: 'used',
+      category: 'sedan',
+      description:
+        'Well-maintained Toyota Camry with low mileage. Perfect for daily commuting.',
+      features: [
+        'Air Conditioning',
+        'Bluetooth',
+        'Backup Camera',
+        'Cruise Control',
+      ],
+      images: ['https://placehold.co/600x400?text=Toyota+Camry'],
+      thumbnail: 'https://placehold.co/150x100?text=Toyota+Camry',
+      inStock: true,
+      isFeatured: false,
+    },
+    {
+      id: createId(),
+      make: 'Honda',
+      model: 'Civic',
+      year: 2022,
+      price: '24900',
+      mileage: 22000,
+      color: 'Blue',
+      fuelType: 'gasoline',
+      transmission: 'manual',
+      condition: 'used',
+      category: 'sedan',
+      description:
+        'Sporty Honda Civic with manual transmission. Great fuel economy.',
+      features: [
+        'Manual Transmission',
+        'Sport Mode',
+        'Apple CarPlay',
+        'Lane Keeping Assist',
+      ],
+      images: ['https://placehold.co/600x400?text=Honda+Civic'],
+      thumbnail: 'https://placehold.co/150x100?text=Honda+Civic',
+      inStock: true,
+      isFeatured: false,
+    },
+    {
+      id: createId(),
+      make: 'Ford',
+      model: 'F-150',
+      year: 2024,
+      price: '45000',
+      mileage: 5000,
+      color: 'Red',
+      fuelType: 'gasoline',
+      transmission: 'automatic',
+      condition: 'new',
+      category: 'truck',
+      description:
+        'Brand new Ford F-150 pickup truck. Perfect for work and play.',
+      features: ['4WD', 'Towing Package', 'Bed Liner', 'Navigation System'],
+      images: ['https://placehold.co/600x400?text=Ford+F-150'],
+      thumbnail: 'https://placehold.co/150x100?text=Ford+F-150',
+      inStock: true,
+      isFeatured: false,
+    },
+    {
+      id: createId(),
+      make: 'Tesla',
+      model: 'Model 3',
+      year: 2023,
+      price: '42000',
+      mileage: 8000,
+      color: 'White',
+      fuelType: 'electric',
+      transmission: 'automatic',
+      condition: 'used',
+      category: 'sedan',
+      description:
+        'Electric Tesla Model 3 with autopilot features. Eco-friendly and efficient.',
+      features: ['Autopilot', 'Supercharging', 'Premium Audio', 'Glass Roof'],
+      images: ['https://placehold.co/600x400?text=Tesla+Model+3'],
+      thumbnail: 'https://placehold.co/150x100?text=Tesla+Model+3',
+      inStock: true,
+      isFeatured: false,
+    },
+    {
+      id: createId(),
+      make: 'BMW',
+      model: 'X5',
+      year: 2022,
+      price: '58000',
+      mileage: 18000,
+      color: 'Black',
+      fuelType: 'gasoline',
+      transmission: 'automatic',
+      condition: 'used',
+      category: 'suv',
+      description:
+        'Luxury BMW X5 SUV with premium features and excellent performance.',
+      features: [
+        'All-Wheel Drive',
+        'Premium Sound',
+        'Panoramic Sunroof',
+        'Heated Seats',
+      ],
+      images: ['https://placehold.co/600x400?text=BMW+X5'],
+      thumbnail: 'https://placehold.co/150x100?text=BMW+X5',
+      inStock: true,
+      isFeatured: false,
+    },
+  ],
 };
 
-/**
- * Seeds the database with initial data
- */
-export async function seedDatabase() {
+async function seed() {
   try {
-    console.log('🌱 Starting database seeding...');
+    console.log('🌱 Starting database seed...');
 
-    // Check if super admin already exists
-    const existingSuperAdmin = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, DEFAULT_SUPER_ADMIN.email))
-      .limit(1);
+    // Clear existing data (be careful in production!)
+    console.log('🧹 Clearing existing data...');
 
-    if (existingSuperAdmin.length > 0) {
-      console.log('✅ Super admin user already exists, skipping creation');
-      return;
-    }
+    // Delete in correct order due to foreign key constraints
+    if (schema.sessions) await db.delete(schema.sessions);
+    if (schema.users) await db.delete(schema.users);
 
-    // Hash the default password
-    const hashedPassword = await AuthUtils.hashPassword(
-      DEFAULT_SUPER_ADMIN.password
+    console.log('✅ Existing data cleared');
+
+    // Seed users
+    console.log('👥 Seeding users...');
+    const hashedUsers = await Promise.all(
+      seedData.users.map(async (user) => {
+        const { password, ...rest } = user;
+        return {
+          ...rest,
+          passwordHash: await hash(password, 12),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+      })
     );
 
-    // Create super admin user
-    const [superAdmin] = await db
-      .insert(users)
-      .values({
-        email: DEFAULT_SUPER_ADMIN.email,
-        passwordHash: hashedPassword,
-        username: DEFAULT_SUPER_ADMIN.username,
-        role: DEFAULT_SUPER_ADMIN.role,
-        isActive: true,
-      })
-      .returning();
+    await db.insert(schema.users).values(hashedUsers);
+    console.log(`✅ Seeded ${hashedUsers.length} users`);
 
-    console.log('✅ Super admin user created successfully:');
-    console.log(`   Email: ${DEFAULT_SUPER_ADMIN.email}`);
-    console.log(`   Password: ${DEFAULT_SUPER_ADMIN.password}`);
-    console.log(`   Role: ${DEFAULT_SUPER_ADMIN.role}`);
-    console.log(
-      '   ⚠️  IMPORTANT: Change the default password after first login!'
-    );
+    // Seed vehicles
+    console.log('🚗 Seeding vehicles...');
+    const vehiclesWithDefaults = seedData.vehicles.map((vehicle) => ({
+      ...vehicle,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
 
-    // You can add more seed data here, such as:
-    // - Sample car inventory
-    // - Additional admin users
-    // - Default categories, etc.
+    await db.insert(schema.cars).values(vehiclesWithDefaults);
+    console.log(`✅ Seeded ${vehiclesWithDefaults.length} vehicles`);
 
-    console.log('🎉 Database seeding completed successfully!');
+    console.log('🌱 Database seed completed');
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
-    throw error;
+    console.error('🚨 Error seeding database:', error);
   }
 }
 
-/**
- * Creates additional admin users (for development/testing)
- */
-export async function createAdminUser(
-  email: string,
-  password: string,
-  username?: string,
-  role: UserRole = UserRole.ADMIN
-) {
-  try {
-    // Check if user already exists
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
-
-    if (existingUser.length > 0) {
-      throw new Error(`User with email ${email} already exists`);
-    }
-
-    // Hash the password
-    const hashedPassword = await AuthUtils.hashPassword(password);
-
-    // Create the user
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        email,
-        passwordHash: hashedPassword,
-        username,
-        role,
-        isActive: true,
-      })
-      .returning();
-
-    console.log(`✅ Admin user created: ${email} (${role})`);
-    return newUser;
-  } catch (error) {
-    console.error('❌ Error creating admin user:', error);
-    throw error;
-  }
-}
-
-/**
- * Resets the super admin password (for recovery)
- */
-export async function resetSuperAdminPassword(newPassword: string) {
-  try {
-    // Hash the new password
-    const hashedPassword = await AuthUtils.hashPassword(newPassword);
-
-    // Update super admin password
-    const [updatedUser] = await db
-      .update(users)
-      .set({
-        passwordHash: hashedPassword,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.email, DEFAULT_SUPER_ADMIN.email))
-      .returning();
-
-    if (!updatedUser) {
-      throw new Error('Super admin user not found');
-    }
-
-    console.log('✅ Super admin password reset successfully');
-    return updatedUser;
-  } catch (error) {
-    console.error('❌ Error resetting super admin password:', error);
-    throw error;
-  }
-}
-
-// Run seeding if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  seedDatabase()
-    .then(() => {
-      console.log('Seeding completed');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('Seeding failed:', error);
-      process.exit(1);
-    });
+if (require.main === module) {
+  seed();
 }

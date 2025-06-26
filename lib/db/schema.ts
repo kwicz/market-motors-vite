@@ -20,6 +20,9 @@ export const users = pgTable('users', {
   username: text('username'),
   role: text('role').notNull().default('user'), // 'user', 'admin', 'super_admin'
   isActive: boolean('is_active').notNull().default(true),
+  isVerified: boolean('is_verified').notNull().default(false),
+  twoFactorEnabled: boolean('two_factor_enabled').notNull().default(false),
+  twoFactorSecret: text('two_factor_secret'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });

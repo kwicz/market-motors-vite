@@ -24,6 +24,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import UserManagement from './pages/UserManagement';
 import AdminReports from './pages/AdminReports';
 import AdminSettings from './pages/AdminSettings';
+import PerformanceMonitor from './components/dev/PerformanceMonitor';
 
 const queryClient = new QueryClient();
 
@@ -109,6 +110,7 @@ const App = () => (
             <Route path='*' element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <PerformanceMonitor />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

@@ -1,34 +1,122 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
   postgres:
-    image: postgres:15
+    image: postgres:16-alpine
+    container_name: market-motors-db
     environment:
       POSTGRES_DB: market_motors
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: market_motors_user
+      POSTGRES_PASSWORD: market_motors_password
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ['CMD-SHELL', 'pg_isready -U market_motors_user -d market_motors']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - market-motors-network
 
+  # Redis Cache
   redis:
     image: redis:7-alpine
+    container_name: market-motors-redis
     ports:
       - '6379:6379'
+    command: redis-server --appendonly yes --requirepass redis_password
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - market-motors-network
+
+  # Market Motors Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: market-motors-app
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+
+      # Database Configuration
+      DATABASE_URL: postgresql://market_motors_user:market_motors_password@postgres:5432/market_motors
+      DB_SSL: false
+
+      # Redis Configuration
+      REDIS_URL: redis://:redis_password@redis:6379
+
+      # Authentication Secrets (use secure values in production)
+      JWT_SECRET: your-super-secure-jwt-secret-for-production-at-least-64-characters
+      JWT_REFRESH_SECRET: your-super-secure-refresh-secret-for-production-at-least-64-characters
+      SESSION_SECRET: your-super-secure-session-secret-for-production-at-least-64-characters
+
+      # Application URLs
+      APP_URL: http://localhost:3000
+      API_URL: http://localhost:3000
+      VITE_API_BASE_URL: http://localhost:3000/api
+
+      # Security Settings
+      CORS_ORIGIN: http://localhost:3000
+      SESSION_COOKIE_SECURE: false
+      TRUST_PROXY: false
+
+      # Feature Flags
+      ENABLE_REDIS_CACHE: true
+      ENABLE_IMAGE_OPTIMIZATION: true
+
+      # Logging
+      LOG_LEVEL: info
+      LOG_DIR: /app/logs
+    volumes:
+      - app_uploads:/app/uploads
+      - app_logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:3000/health',
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - market-motors-network
 
 volumes:
   postgres_data:
+    driver: local
   redis_data:
+    driver: local
+  app_uploads:
+    driver: local
+  app_logs:
+    driver: local
+
+networks:
+  market-motors-network:
+    driver: bridge

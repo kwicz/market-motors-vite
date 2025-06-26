@@ -77,26 +77,26 @@ export declare const adminUserCreationSchema: z.ZodEffects<z.ZodObject<{
     username: z.ZodOptional<z.ZodString>;
     role: z.ZodEnum<[UserRole.ADMIN, UserRole.SUPER_ADMIN]>;
 }, "strip", z.ZodTypeAny, {
-    email: string;
     role: UserRole.ADMIN | UserRole.SUPER_ADMIN;
+    email: string;
     password: string;
     confirmPassword: string;
     username?: string | undefined;
 }, {
-    email: string;
     role: UserRole.ADMIN | UserRole.SUPER_ADMIN;
+    email: string;
     password: string;
     confirmPassword: string;
     username?: string | undefined;
 }>, {
-    email: string;
     role: UserRole.ADMIN | UserRole.SUPER_ADMIN;
+    email: string;
     password: string;
     confirmPassword: string;
     username?: string | undefined;
 }, {
-    email: string;
     role: UserRole.ADMIN | UserRole.SUPER_ADMIN;
+    email: string;
     password: string;
     confirmPassword: string;
     username?: string | undefined;
@@ -115,11 +115,11 @@ export declare const userStatusUpdateSchema: z.ZodObject<{
     userId: z.ZodString;
     isActive: z.ZodBoolean;
 }, "strip", z.ZodTypeAny, {
-    isActive: boolean;
     userId: string;
+    isActive: boolean;
 }, {
-    isActive: boolean;
     userId: string;
+    isActive: boolean;
 }>;
 export declare const userUpdateSchema: z.ZodObject<{
     email: z.ZodOptional<z.ZodString>;

@@ -278,17 +278,22 @@ const AdminInventory: React.FC = () => {
     <AdminLayout>
       <div className='space-y-6'>
         {/* Header */}
-        <div className='flex items-center justify-between'>
+        <div
+          className='flex flex-col md:flex-row md:items-center md:justify-between'
+          data-lov-id='src/pages/AdminInventory.tsx:282:8'
+        >
           <div>
             <h1 className='text-3xl font-bold'>Vehicle Inventory</h1>
             <p className='text-gray-600 mt-1'>
               Manage your vehicle inventory ({filteredCars.length} vehicles)
             </p>
           </div>
-          <Button onClick={() => navigate('/admin/add-vehicle')}>
-            <Plus className='h-4 w-4 mr-2' />
-            Add Vehicle
-          </Button>
+          <div className='mt-4 md:mt-0 flex w-full md:w-auto justify-start md:justify-end'>
+            <Button onClick={() => navigate('/admin/add-vehicle')}>
+              <Plus className='h-4 w-4 mr-2' />
+              Add Vehicle
+            </Button>
+          </div>
         </div>
 
         {/* Search and Actions */}

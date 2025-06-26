@@ -239,14 +239,17 @@ const AdminDashboard: React.FC = () => {
     <AdminLayout>
       <div className='space-y-6'>
         {/* Header */}
-        <div className='flex items-center justify-between'>
+        <div
+          className='flex flex-col md:flex-row md:items-center md:justify-between'
+          data-lov-id='src/pages/AdminDashboard.tsx:242:8'
+        >
           <div>
             <h1 className='text-3xl font-bold'>Dashboard</h1>
             <p className='text-gray-600 mt-1'>
               Welcome back! Here's your inventory overview.
             </p>
           </div>
-          <div className='flex items-center space-x-3'>
+          <div className='flex items-center space-x-3 mt-4 md:mt-0 md:justify-end justify-start w-full md:w-auto'>
             <select
               value={selectedPeriod}
               onChange={handleSelectPeriod}

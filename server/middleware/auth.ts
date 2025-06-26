@@ -36,7 +36,7 @@ export const authenticate = async (
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication token required',
         code: 'TOKEN_REQUIRED',
@@ -44,13 +44,14 @@ export const authenticate = async (
         path: req.path,
         method: req.method,
       });
+      return;
     }
 
     const token = authHeader.substring(7);
     const payload = AuthUtils.verifyAccessToken(token);
 
     if (!payload) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Invalid or expired token',
         code: 'TOKEN_INVALID',
@@ -58,6 +59,7 @@ export const authenticate = async (
         path: req.path,
         method: req.method,
       });
+      return;
     }
 
     // Get user from database
@@ -74,7 +76,7 @@ export const authenticate = async (
       .limit(1);
 
     if (!user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'User not found',
         code: 'USER_NOT_FOUND',
@@ -82,10 +84,11 @@ export const authenticate = async (
         path: req.path,
         method: req.method,
       });
+      return;
     }
 
     if (!user.isActive) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Account is deactivated',
         code: 'ACCOUNT_DEACTIVATED',
@@ -93,6 +96,7 @@ export const authenticate = async (
         path: req.path,
         method: req.method,
       });
+      return;
     }
 
     // Attach user to request
@@ -116,8 +120,7 @@ export const authenticate = async (
         userId: req.user?.id,
       }
     );
-
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: 'Internal server error during authentication',
       code: 'AUTH_ERROR',
@@ -125,6 +128,7 @@ export const authenticate = async (
       path: req.path,
       method: req.method,
     });
+    return;
   }
 };
 
@@ -134,11 +138,12 @@ export const authenticate = async (
 export const authorize = (permissions: Permission | Permission[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication required',
         code: 'AUTHENTICATION_REQUIRED',
       });
+      return;
     }
 
     const userRole = req.user.role;
@@ -153,13 +158,14 @@ export const authorize = (permissions: Permission | Permission[]) => {
     );
 
     if (!hasPermissions) {
-      return res.status(403).json({
+      res.status(403).json({
         success: false,
         message: 'Insufficient permissions',
         code: 'INSUFFICIENT_PERMISSIONS',
         required: requiredPermissions,
         userRole,
       });
+      return;
     }
 
     next();
@@ -172,23 +178,25 @@ export const authorize = (permissions: Permission | Permission[]) => {
 export const requireRole = (requiredRole: UserRole) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication required',
         code: 'AUTHENTICATION_REQUIRED',
       });
+      return;
     }
 
     const userRole = req.user.role;
 
     if (!hasHigherOrEqualRole(userRole, requiredRole)) {
-      return res.status(403).json({
+      res.status(403).json({
         success: false,
         message: `Access denied. Required role: ${requiredRole}`,
         code: 'INSUFFICIENT_ROLE',
         required: requiredRole,
         userRole,
       });
+      return;
     }
 
     next();
@@ -271,11 +279,12 @@ export const optionalAuth = async (
 export const requireOwnershipOrAdmin = (userIdParam: string = 'userId') => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication required',
         code: 'AUTHENTICATION_REQUIRED',
       });
+      return;
     }
 
     const targetUserId = req.params[userIdParam];
@@ -290,10 +299,11 @@ export const requireOwnershipOrAdmin = (userIdParam: string = 'userId') => {
       return next();
     }
 
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'Access denied. You can only access your own resources.',
       code: 'ACCESS_DENIED',
     });
+    return;
   };
 };

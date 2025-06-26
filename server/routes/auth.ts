@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from '../../lib/db';
 import { users, sessions } from '../../lib/db/schema';
+import { emailVerificationTokens } from '../../lib/db/schema';
 import { AuthUtils, UserRole } from '../../lib/auth';
 import {
   userRegistrationSchema,
@@ -9,9 +10,8 @@ import {
   passwordChangeSchema,
 } from '../../lib/validations/user';
 import { eq, and } from 'drizzle-orm';
-import { authenticate } from '../middleware/auth';
+import { asyncHandler } from '../middleware/error';
 import {
-  asyncHandler,
   sendSuccess,
   NotFoundError,
   ValidationError,
@@ -19,6 +19,7 @@ import {
   UnauthorizedError,
   DatabaseError,
 } from '../middleware/error';
+import { authenticate } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -271,7 +272,7 @@ router.post(
  */
 router.post(
   '/logout',
-  authenticate,
+  asyncHandler(authenticate),
   asyncHandler(async (req, res) => {
     const userId = req.user!.id;
 
@@ -303,7 +304,7 @@ router.post(
  */
 router.post(
   '/logout-all',
-  authenticate,
+  asyncHandler(authenticate),
   asyncHandler(async (req, res) => {
     const userId = req.user!.id;
 
@@ -329,7 +330,7 @@ router.post(
  */
 router.get(
   '/me',
-  authenticate,
+  asyncHandler(authenticate),
   asyncHandler(async (req, res) => {
     const user = req.user!;
 
@@ -362,7 +363,7 @@ router.get(
  */
 router.post(
   '/change-password',
-  authenticate,
+  asyncHandler(authenticate),
   asyncHandler(async (req, res) => {
     const validatedData = passwordChangeSchema.parse(req.body);
     const { currentPassword, newPassword } = validatedData;
@@ -423,6 +424,56 @@ router.post(
       );
 
     sendSuccess(res, null, 'Password changed successfully');
+  })
+);
+
+/**
+ * POST /api/auth/verify-email
+ * Verify user email with token
+ */
+router.post(
+  '/verify-email',
+  asyncHandler(async (req, res) => {
+    const { token } = req.body;
+    if (!token || typeof token !== 'string') {
+      throw new ValidationError('Verification token is required');
+    }
+
+    // Find verification token
+    const [verification] = await db
+      .select()
+      .from(emailVerificationTokens)
+      .where(eq(emailVerificationTokens.token, token))
+      .limit(1);
+
+    if (!verification) {
+      throw new NotFoundError('Invalid or expired verification token');
+    }
+    if (verification.isUsed) {
+      throw new ConflictError('Verification token has already been used');
+    }
+    if (verification.expiresAt < new Date()) {
+      throw new ValidationError('Verification token has expired');
+    }
+
+    // Mark user as verified
+    const updated = await db
+      .update(users)
+      .set({ isVerified: true, updatedAt: new Date() })
+      .where(eq(users.id, verification.userId))
+      .returning({ id: users.id });
+
+    if (updated.length === 0) {
+      throw new NotFoundError('User not found');
+    }
+
+    // Mark token as used
+    await db
+      .update(emailVerificationTokens)
+      .set({ isUsed: true })
+      .where(eq(emailVerificationTokens.id, verification.id));
+
+    sendSuccess(res, null, 'Email verified successfully');
   })
 );
 

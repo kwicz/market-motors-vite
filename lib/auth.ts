@@ -1,4 +1,5 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 import bcrypt from 'bcryptjs';
 import { User } from './db/schema';
 
@@ -80,9 +81,10 @@ export class AuthUtils {
     return secret;
   }
 
-  private static readonly JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
-  private static readonly JWT_REFRESH_EXPIRES_IN =
-    process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+  private static readonly JWT_EXPIRES_IN: StringValue = (process.env
+    .JWT_EXPIRES_IN || '1h') as StringValue;
+  private static readonly JWT_REFRESH_EXPIRES_IN: StringValue = (process.env
+    .JWT_REFRESH_EXPIRES_IN || '7d') as StringValue;
 
   // Hash password
   static async hashPassword(password: string): Promise<string> {
@@ -100,18 +102,20 @@ export class AuthUtils {
 
   // Generate access token
   static generateAccessToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
-    return jwt.sign(payload, this.getJWTSecret(), {
+    const options: SignOptions = {
       expiresIn: this.JWT_EXPIRES_IN,
-    });
+    };
+    return jwt.sign({ ...payload }, this.getJWTSecret(), options);
   }
 
   // Generate refresh token
   static generateRefreshToken(
     payload: Omit<RefreshTokenPayload, 'iat' | 'exp'>
   ): string {
-    return jwt.sign(payload, this.getJWTRefreshSecret(), {
+    const options: SignOptions = {
       expiresIn: this.JWT_REFRESH_EXPIRES_IN,
-    });
+    };
+    return jwt.sign({ ...payload }, this.getJWTRefreshSecret(), options);
   }
 
   // Verify access token

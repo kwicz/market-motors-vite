@@ -13,7 +13,7 @@ import {
 } from 'drizzle-orm';
 import { db } from '../../lib/db';
 import { cars } from '../../lib/db/schema';
-import { authenticate, authorize } from '../middleware/auth';
+import { authorize, authenticate } from '../middleware/auth';
 import { vehicleCacheService } from '../services/vehicleCache';
 import {
   carCreationSchema,
@@ -172,7 +172,7 @@ router.get(
 // GET /api/cars/dashboard/metrics - Get dashboard metrics for admin
 router.get(
   '/dashboard/metrics',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['view_admin_dashboard']),
   asyncHandler(async (req, res) => {
     const validatedQuery = carStatsSchema.parse(req.query);
@@ -357,7 +357,7 @@ router.get(
 // POST /api/cars - Create new car
 router.post(
   '/',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['create_car']),
   asyncHandler(async (req, res) => {
     const validatedData = carCreationSchema.parse(req.body);
@@ -383,7 +383,7 @@ router.post(
 // PUT /api/cars/:id - Update car
 router.put(
   '/:id',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['update_car']),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -409,7 +409,7 @@ router.put(
 // DELETE /api/cars/:id - Delete car
 router.delete(
   '/:id',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['delete_car']),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -427,7 +427,7 @@ router.delete(
 // PATCH /api/cars/:id/featured - Toggle featured status
 router.patch(
   '/:id/featured',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['manage_inventory']),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -461,7 +461,7 @@ router.patch(
 // PATCH /api/cars/:id/stock - Update stock status
 router.patch(
   '/:id/stock',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['manage_inventory']),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -495,7 +495,7 @@ router.patch(
 // POST /api/cars/bulk - Perform bulk operations on cars
 router.post(
   '/bulk',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['manage_inventory']),
   asyncHandler(async (req, res) => {
     const validatedData = bulkCarOperationSchema.parse(req.body);
@@ -591,7 +591,7 @@ router.post(
 // POST /api/cars/bulk/preview - Preview bulk operation results
 router.post(
   '/bulk/preview',
-  authenticate,
+  asyncHandler(authenticate),
   authorize(['manage_inventory']),
   asyncHandler(async (req, res) => {
     const validatedData = bulkCarOperationSchema.parse(req.body);

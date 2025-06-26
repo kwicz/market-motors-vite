@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { db } from '../../lib/db';
 import { users } from '../../lib/db/schema';
 import {
-  authenticate,
   requireSuperAdmin,
   requireOwnershipOrAdmin,
+  authenticate,
 } from '../middleware/auth';
 import { AuthUtils, UserRole } from '../../lib/auth';
 import {
@@ -24,6 +24,8 @@ import {
   ConflictError,
   DatabaseError,
 } from '../middleware/error';
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
 
 const router = express.Router();
 
@@ -50,7 +52,7 @@ const userListQuerySchema = z.object({
 // Get all users (super admin only) with pagination, filtering, and search
 router.get(
   '/',
-  authenticate,
+  asyncHandler(authenticate),
   requireSuperAdmin,
   asyncHandler(async (req, res) => {
     const query = userListQuerySchema.parse(req.query);
@@ -148,7 +150,7 @@ router.get(
 // Get user by ID (super admin or user themselves)
 router.get(
   '/:id',
-  authenticate,
+  asyncHandler(authenticate),
   requireOwnershipOrAdmin('id'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -182,7 +184,7 @@ router.get(
 // Create new user (super admin only)
 router.post(
   '/',
-  authenticate,
+  asyncHandler(authenticate),
   requireSuperAdmin,
   asyncHandler(async (req, res) => {
     const validatedData = adminUserCreationSchema.parse(req.body);
@@ -234,7 +236,7 @@ router.post(
 // Update user (super admin or user themselves)
 router.put(
   '/:id',
-  authenticate,
+  asyncHandler(authenticate),
   requireOwnershipOrAdmin('id'),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -308,7 +310,7 @@ router.put(
 // Update user role (super admin only)
 router.patch(
   '/:id/role',
-  authenticate,
+  asyncHandler(authenticate),
   requireSuperAdmin,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -353,7 +355,7 @@ router.patch(
 // Update user status (super admin only)
 router.patch(
   '/:id/status',
-  authenticate,
+  asyncHandler(authenticate),
   requireSuperAdmin,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -402,7 +404,7 @@ router.patch(
 // Delete user (super admin only)
 router.delete(
   '/:id',
-  authenticate,
+  asyncHandler(authenticate),
   requireSuperAdmin,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -437,7 +439,7 @@ router.delete(
 // Get user statistics (super admin only)
 router.get(
   '/stats/overview',
-  authenticate,
+  asyncHandler(authenticate),
   requireSuperAdmin,
   asyncHandler(async (req, res) => {
     // Get total users
@@ -485,6 +487,142 @@ router.get(
     };
 
     sendSuccess(res, data, 'User statistics retrieved successfully');
+  })
+);
+
+// Get current user's profile
+router.get(
+  '/me',
+  asyncHandler(authenticate),
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.id;
+    const [user] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        username: users.username,
+        role: users.role,
+        isActive: users.isActive,
+        isVerified: users.isVerified,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+    sendSuccess(res, user, 'Profile retrieved successfully');
+  })
+);
+
+// Update current user's profile (username only)
+router.put(
+  '/me',
+  asyncHandler(authenticate),
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.id;
+    const { username } = req.body;
+    if (!username || typeof username !== 'string') {
+      throw new ValidationError('Username is required');
+    }
+    const [updatedUser] = await db
+      .update(users)
+      .set({ username, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning({
+        id: users.id,
+        email: users.email,
+        username: users.username,
+        role: users.role,
+        isActive: users.isActive,
+        isVerified: users.isVerified,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      });
+    if (!updatedUser) {
+      throw new NotFoundError('User not found');
+    }
+    sendSuccess(res, updatedUser, 'Profile updated successfully');
+  })
+);
+
+// Enable/setup 2FA: generate secret and QR code
+router.post(
+  '/me/2fa/setup',
+  asyncHandler(authenticate),
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.id;
+    // Generate a TOTP secret
+    const secret = speakeasy.generateSecret({
+      name: `Market Motors (${req.user!.email})`,
+    });
+    // Save the base32 secret to the user (but do not enable 2FA yet)
+    await db
+      .update(users)
+      .set({ twoFactorSecret: secret.base32, updatedAt: new Date() })
+      .where(eq(users.id, userId));
+    // Generate QR code data URL
+    const otpauthUrl = secret.otpauth_url!;
+    const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl);
+    res.json({ secret: secret.base32, otpauthUrl, qrCodeDataUrl });
+  })
+);
+
+// Verify 2FA code and enable 2FA
+router.post(
+  '/me/2fa/verify',
+  asyncHandler(authenticate),
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.id;
+    const { token } = req.body;
+    if (!token || typeof token !== 'string') {
+      throw new ValidationError('2FA token is required');
+    }
+    // Get user's secret
+    const [user] = await db
+      .select({ twoFactorSecret: users.twoFactorSecret })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    if (!user || !user.twoFactorSecret) {
+      throw new NotFoundError('2FA secret not found');
+    }
+    // Verify the token
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token,
+      window: 1,
+    });
+    if (!verified) {
+      throw new ValidationError('Invalid 2FA token');
+    }
+    // Enable 2FA
+    await db
+      .update(users)
+      .set({ twoFactorEnabled: true, updatedAt: new Date() })
+      .where(eq(users.id, userId));
+    sendSuccess(res, null, 'Two-factor authentication enabled');
+  })
+);
+
+// Disable 2FA
+router.post(
+  '/me/2fa/disable',
+  asyncHandler(authenticate),
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.id;
+    await db
+      .update(users)
+      .set({
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+    sendSuccess(res, null, 'Two-factor authentication disabled');
   })
 );
 

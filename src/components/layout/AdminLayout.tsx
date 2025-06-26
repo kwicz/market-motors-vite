@@ -60,17 +60,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       icon: Plus,
     },
     {
+      id: 'reports',
+      label: 'Reports',
+      path: '/admin/reports',
+      icon: FileText,
+    },
+    {
       id: 'users',
       label: 'User Management',
       path: '/admin/users',
       icon: Users,
       requiredRole: UserRole.SUPER_ADMIN,
-    },
-    {
-      id: 'reports',
-      label: 'Reports',
-      path: '/admin/reports',
-      icon: FileText,
     },
     {
       id: 'settings',

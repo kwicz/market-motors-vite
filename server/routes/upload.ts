@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { z } from 'zod';
-import { authenticate, requireAdmin } from '../middleware/auth.js';
+import { asyncHandler } from '../middleware/error';
 import {
   processImage,
   createImageVariants,
@@ -12,12 +12,8 @@ import {
   getImageDimensions,
   MulterFile,
 } from '../utils/imageProcessor.js';
-import {
-  asyncHandler,
-  sendSuccess,
-  ValidationError,
-  AppError,
-} from '../middleware/error';
+import { sendSuccess, ValidationError, AppError } from '../middleware/error';
+import { authenticate, requireAdmin } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -61,7 +57,7 @@ const imageUploadSchema = z.object({
  */
 router.post(
   '/single',
-  authenticate,
+  asyncHandler(authenticate),
   requireAdmin,
   upload.single('image'),
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -129,7 +125,7 @@ router.post(
  */
 router.post(
   '/multiple',
-  authenticate,
+  asyncHandler(authenticate),
   requireAdmin,
   upload.array('images', 10),
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -214,7 +210,7 @@ router.post(
  */
 router.post(
   '/variants',
-  authenticate,
+  asyncHandler(authenticate),
   requireAdmin,
   upload.single('image'),
   asyncHandler(async (req: Request, res: Response): Promise<void> => {
