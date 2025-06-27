@@ -6,8 +6,8 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Car } from '@lib/db/schema';
-import { formatPrice, formatMileage } from '@lib/utils';
+import { Car } from '@/lib/types';
+import { formatPrice, formatMileage } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 

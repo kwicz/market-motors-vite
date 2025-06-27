@@ -41,7 +41,7 @@ import {
   Eye,
   ImageIcon,
 } from 'lucide-react';
-import { carCreationSchema } from '@lib/validations/vehicle';
+import { carCreationSchema } from '@/lib/validations/vehicle';
 import CameraCapture from '@/components/ui/CameraCapture';
 
 // Types for image handling

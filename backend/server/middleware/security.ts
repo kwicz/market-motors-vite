@@ -414,9 +414,12 @@ export const sanitizeInput = (
     req.body = sanitizeObject(req.body);
   }
 
-  // Sanitize query parameters
-  if (req.query) {
-    req.query = sanitizeObject(req.query) as typeof req.query;
+  // Sanitize query parameters by creating a new object
+  if (req.query && Object.keys(req.query).length > 0) {
+    const sanitizedQuery = sanitizeObject(req.query) as typeof req.query;
+    // Replace the query object properties instead of the whole object
+    Object.keys(req.query).forEach((key) => delete req.query[key]);
+    Object.assign(req.query, sanitizedQuery);
   }
 
   next();
