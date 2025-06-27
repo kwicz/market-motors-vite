@@ -15,6 +15,7 @@ COPY backend/.npmrc ./
 RUN npm ci --prefer-offline --no-audit --no-fund
 COPY backend .
 RUN npm run build
+RUN npm ci --prefer-offline --no-audit --no-fund --omit=dev
 
 # ---------- Production Image ----------
 FROM node:20-alpine
@@ -23,8 +24,6 @@ ENV NODE_ENV=production
 
 # Copy backend build and node_modules
 COPY --from=backend-build /app/backend .
-# Remove dev dependencies for production
-RUN npm ci --prefer-offline --no-audit --no-fund --omit=dev
 
 # Copy frontend build into backend
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
