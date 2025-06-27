@@ -7,11 +7,11 @@
     "dev": "vite",
     "dev:server": "nodemon --exec \"tsx server/index.ts\"",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
-    "build": "vite build && npm run build:server",
+    "build": "tsc && vite build",
     "build:dev": "vite build --mode development",
     "build:server": "tsc --project server/tsconfig.json",
     "start": "node server/dist/index.js",
-    "lint": "eslint .",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start:server": "node server/dist/index.js",
     "test": "vitest",
@@ -45,7 +45,7 @@
     "db:test": "tsx lib/db/test-connection.ts",
     "deploy:railway": "./scripts/deploy-railway.sh",
     "deploy:build": "npm run build && npm run db:migrate",
-    "postinstall": "if [ -d server ]; then npm run build:server; fi"
+    "postinstall": "node -e \"const fs = require('fs'); if (fs.existsSync('server/tsconfig.json')) { require('child_process').execSync('npm run build:server', {stdio: 'inherit'}); }\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
