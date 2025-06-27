@@ -16,7 +16,7 @@ COPY package*.json ./
 COPY .npmrc ./
 
 # Install dependencies with memory optimization
-RUN npm ci --omit=dev --prefer-offline --no-audit --no-fund --maxsockets=1
+RUN npm ci --prefer-offline --no-audit --no-fund --maxsockets=1
 
 # Copy source code
 COPY . .

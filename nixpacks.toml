@@ -6,7 +6,7 @@ nixPkgs = ["nodejs-20_x", "npm-9_x"]
 
 [phases.install]
 cmds = [
-    "npm ci --omit=dev --prefer-offline --no-audit --no-fund --maxsockets=1 --cache-max=0"
+    "npm ci --prefer-offline --no-audit --no-fund --maxsockets=1 --cache-max=0"
 ]
 
 [phases.build]
