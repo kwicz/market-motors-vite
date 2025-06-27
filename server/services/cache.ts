@@ -12,11 +12,13 @@ export class CacheService {
 
   /**
    * Get cached data by key
+   * @param key - Cache key
+   * @returns Cached data or null if not found
    */
   async get<T>(key: string): Promise<T | null> {
     try {
       const data = await redisClient.get(key);
-      return data ? JSON.parse(data) : null;
+      return data ? JSON.parse(data.toString()) : null;
     } catch (error) {
       console.error(`Cache get error for key ${key}:`, error);
       return null;
@@ -102,7 +104,10 @@ export class CacheService {
    */
   async incr(key: string): Promise<number | null> {
     try {
-      return await redisClient.incr(key);
+      const result = await redisClient.incr(key);
+      return typeof result === 'number'
+        ? result
+        : parseInt(result.toString(), 10);
     } catch (error) {
       console.error(`Cache increment error for key ${key}:`, error);
       return null;
@@ -115,7 +120,9 @@ export class CacheService {
   async mget<T>(keys: string[]): Promise<(T | null)[]> {
     try {
       const values = await redisClient.mGet(keys);
-      return values.map((value) => (value ? JSON.parse(value) : null));
+      return values.map((value) =>
+        value ? JSON.parse(value.toString()) : null
+      );
     } catch (error) {
       console.error(`Cache mget error for keys ${keys.join(', ')}:`, error);
       return keys.map(() => null);

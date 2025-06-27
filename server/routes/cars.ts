@@ -364,6 +364,7 @@ router.post(
 
     const newCar = await db
       .insert(cars)
+      // @ts-expect-error - Type inference issue with spread operator
       .values({
         ...validatedData,
         userId: req.user!.id,

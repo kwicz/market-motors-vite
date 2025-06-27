@@ -4,15 +4,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Frontend build files (not needed for backend)
+# Production build
 dist
 build
-src
-public
-index.html
-vite.config.ts
-tailwind.config.ts
-postcss.config.js
 
 # Environment files
 .env
@@ -42,6 +36,9 @@ coverage
 # Logs
 logs
 *.log
+
+# Server directory (not needed for frontend build)
+server
 
 # Database files
 *.db

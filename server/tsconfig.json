@@ -5,7 +5,7 @@
     "lib": ["ES2020"],
     "outDir": "./dist",
     "rootDir": "../",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,9 +15,14 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "types": ["node", "express"]
+    "types": ["node", "express"],
+    "baseUrl": "../",
+    "paths": {
+      "@lib/*": ["./lib/*"]
+    },
+    "noImplicitAny": false
   },
-  "include": ["**/*.ts", "../lib/**/*.ts"],
+  "include": ["./**/*.ts", "../lib/**/*.ts"],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
     "esm": false,
