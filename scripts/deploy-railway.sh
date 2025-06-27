@@ -92,45 +92,45 @@ fi
 print_status "Setting environment variables in Railway..."
 
 # Database
-railway variables set DATABASE_URL="$DATABASE_URL"
-railway variables set DB_SSL="true"
+railway variables --set "DATABASE_URL=$DATABASE_URL"
+railway variables --set "DB_SSL=true"
 
 # Authentication
-railway variables set JWT_SECRET="$JWT_SECRET"
-railway variables set JWT_REFRESH_SECRET="$JWT_REFRESH_SECRET"
-railway variables set SESSION_SECRET="$SESSION_SECRET"
+railway variables --set "JWT_SECRET=$JWT_SECRET"
+railway variables --set "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET"
+railway variables --set "SESSION_SECRET=$SESSION_SECRET"
 
 # Application
-railway variables set NODE_ENV="production"
-railway variables set PORT="3000"
-railway variables set APP_URL="$APP_URL"
-railway variables set API_URL="$API_URL"
-railway variables set VITE_API_BASE_URL="$VITE_API_BASE_URL"
+railway variables --set "NODE_ENV=production"
+railway variables --set "PORT=3000"
+railway variables --set "APP_URL=$APP_URL"
+railway variables --set "API_URL=$API_URL"
+railway variables --set "VITE_API_BASE_URL=$VITE_API_BASE_URL"
 
 # Security
-railway variables set CORS_ORIGIN="$CORS_ORIGIN"
-railway variables set SESSION_COOKIE_SECURE="true"
-railway variables set TRUST_PROXY="true"
+railway variables --set "CORS_ORIGIN=$CORS_ORIGIN"
+railway variables --set "SESSION_COOKIE_SECURE=true"
+railway variables --set "TRUST_PROXY=true"
 
 # Logging
-railway variables set LOG_LEVEL="${LOG_LEVEL:-info}"
-railway variables set LOG_DIR="/app/logs"
+railway variables --set "LOG_LEVEL=${LOG_LEVEL:-info}"
+railway variables --set "LOG_DIR=/app/logs"
 
 # Error Tracking
 if [ ! -z "$SENTRY_DSN" ]; then
-    railway variables set SENTRY_DSN="$SENTRY_DSN"
-    railway variables set SENTRY_ENVIRONMENT="production"
+    railway variables --set "SENTRY_DSN=$SENTRY_DSN"
+    railway variables --set "SENTRY_ENVIRONMENT=production"
 fi
 
 # Performance Monitoring
 if [ ! -z "$SENTRY_DSN" ]; then
-    railway variables set ENABLE_PERFORMANCE_MONITORING="true"
-    railway variables set PERFORMANCE_SAMPLE_RATE="0.1"
+    railway variables --set "ENABLE_PERFORMANCE_MONITORING=true"
+    railway variables --set "PERFORMANCE_SAMPLE_RATE=0.1"
 fi
 
 # Feature Flags
-railway variables set ENABLE_REDIS_CACHE="${ENABLE_REDIS_CACHE:-true}"
-railway variables set ENABLE_IMAGE_OPTIMIZATION="${ENABLE_IMAGE_OPTIMIZATION:-true}"
+railway variables --set "ENABLE_REDIS_CACHE=${ENABLE_REDIS_CACHE:-true}"
+railway variables --set "ENABLE_IMAGE_OPTIMIZATION=${ENABLE_IMAGE_OPTIMIZATION:-true}"
 
 print_success "Environment variables set successfully"
 
