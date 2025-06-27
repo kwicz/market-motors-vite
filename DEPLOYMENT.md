@@ -1,6 +1,6 @@
-# Railway Deployment Guide - Market Motors
+# Deployment Guide - Market Motors
 
-This project has been reorganized into separate frontend and backend services for Railway deployment.
+This project is ready for fullstack deployment using Docker. (Fly.io deployment instructions will be added here.)
 
 ## 📁 Project Structure
 

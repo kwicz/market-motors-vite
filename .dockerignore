@@ -78,7 +78,6 @@ test-results
 .docker-compose*
 docker-compose*
 Dockerfile.*
-railway.*
 *.backup
 *.bak
 *.tmp

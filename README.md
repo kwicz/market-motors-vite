@@ -179,18 +179,13 @@ The system implements a role-based authentication system:
 
 ## 🚀 Deployment
 
-The application is designed to be deployed on Railway or similar platforms:
-
-1. Set up environment variables
-2. Configure PostgreSQL database
-3. Build and deploy both frontend and backend
-4. Run database migrations
+This project is ready for fullstack deployment using Docker. (Fly.io deployment instructions will be added here.)
 
 ## 📝 License
 
 This project is licensed under the MIT License.
 
-# Market Motors - Fullstack Railway Deployment
+# Market Motors - Fullstack Deployment
 
 This project is now set up for fullstack deployment on Railway using a single Dockerfile at the project root. The Dockerfile builds both the frontend (Vite React) and backend (Express), and the backend serves the frontend static files in production.
 
