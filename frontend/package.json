@@ -96,10 +96,6 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
-    "imagemin-mozjpeg": "^10.0.0",
-    "imagemin-pngquant": "^10.0.0",
-    "imagemin-svgo": "^11.0.1",
-    "imagemin-webp": "^8.0.0",
     "jsdom": "^26.1.0",
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
@@ -109,7 +105,6 @@
     "typescript": "^5.5.3",
     "vite": "^5.4.1",
     "vite-plugin-compression2": "^2.2.0",
-    "vite-plugin-imagemin": "^0.6.1",
     "vitest": "^3.2.4"
   }
 }

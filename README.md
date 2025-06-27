@@ -189,3 +189,23 @@ The application is designed to be deployed on Railway or similar platforms:
 ## 📝 License
 
 This project is licensed under the MIT License.
+
+# Market Motors - Fullstack Railway Deployment
+
+This project is now set up for fullstack deployment on Railway using a single Dockerfile at the project root. The Dockerfile builds both the frontend (Vite React) and backend (Express), and the backend serves the frontend static files in production.
+
+## Deployment Steps
+
+1. **Push your code to GitHub.**
+2. **Connect your GitHub repo to Railway.**
+3. **Railway will build using the root Dockerfile.**
+4. **Set environment variables in the Railway dashboard as needed.**
+5. **Add Railway Postgres/Redis plugins for production databases/caches.**
+
+**Note:** The backend Express server will serve the frontend build from `/frontend/dist` for all non-API routes.
+
+---
+
+# Previous Instructions (Deprecated)
+
+> The previous Docker Compose and multi-Dockerfile setup is no longer recommended for deployment. Use the root Dockerfile for all-in-one deployment on Railway.

@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { componentTagger } from 'lovable-tagger';
-import viteImagemin from 'vite-plugin-imagemin';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { compression } from 'vite-plugin-compression2';
 
@@ -42,38 +41,6 @@ export default defineConfig(({ mode }) => ({
       compression({
         algorithms: ['brotliCompress'],
         exclude: [/\.(br)$/, /\.(gz)$/],
-      }),
-    // Image optimization for production builds
-    mode === 'production' &&
-      viteImagemin({
-        // JPEG optimization
-        mozjpeg: {
-          quality: 85,
-          progressive: true,
-        },
-        // PNG optimization
-        pngquant: {
-          quality: [0.8, 0.9],
-          speed: 4,
-        },
-        // WebP conversion
-        webp: {
-          quality: 85,
-          method: 6,
-        },
-        // SVG optimization
-        svgo: {
-          plugins: [
-            {
-              name: 'removeViewBox',
-              active: false,
-            },
-            {
-              name: 'removeEmptyAttrs',
-              active: false,
-            },
-          ],
-        },
       }),
   ].filter(Boolean),
   resolve: {

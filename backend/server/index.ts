@@ -24,6 +24,8 @@ import {
   advancedRateLimit,
   auditLogger,
 } from './middleware/security';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load environment variables
 dotenv.config();
@@ -168,6 +170,20 @@ app.get('/health', (req, res) => {
 // app.use('/api/auth', authRoutes);
 // app.use('/api/vehicles', vehicleRoutes);
 // app.use('/api/admin', adminRoutes);
+
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+  app.use(express.static(frontendDistPath));
+
+  // For any non-API route, serve index.html (for React Router)
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
 
 // Catch-all for undefined routes
 app.use(notFoundHandler);

@@ -1,5 +1,6 @@
 # Dependencies
 node_modules
+**/node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -66,4 +67,49 @@ e2e
 
 # Playwright
 playwright-report
-test-results 
+test-results
+
+# Docker files
+.dockerignore
+.dockerignore.frontend
+.dockerignore.backend
+.dockerignore.fullstack
+.dockerignore.*
+.docker-compose*
+docker-compose*
+Dockerfile.*
+railway.*
+*.backup
+*.bak
+*.tmp
+*.cache
+*.lock
+*.tgz
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+*.old
+*.orig
+*.rej
+*.patch
+*.diff
+*.map
+*.tsbuildinfo
+*.pid
+*.seed
+*.pem
+*.crt
+*.key
+*.csr
+*.pfx
+*.p12
+*.jks
+*.keystore
+
+# Backend specific files
+backend/server/dist
+backend/logs
+backend/scripts/db-backup
+backend/scripts/db-restore 

@@ -28,11 +28,11 @@ RUN npm run build
 RUN npm ci --prefer-offline --no-audit --no-fund --omit=dev
 
 # Expose port
-EXPOSE 3000
+EXPOSE 4000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+  CMD node -e "require('http').get('http://localhost:4000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the server directly
-CMD ["node", "server/dist/server/index.js"] 
+CMD ["npm", "start"] 
