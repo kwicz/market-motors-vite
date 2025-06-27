@@ -45,7 +45,7 @@
     "db:test": "tsx lib/db/test-connection.ts",
     "deploy:railway": "./scripts/deploy-railway.sh",
     "deploy:build": "npm run build && npm run db:migrate",
-    "postinstall": "npm run build:server"
+    "postinstall": "if [ -d server ]; then npm run build:server; fi"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
