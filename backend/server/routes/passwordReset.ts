@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { z } from 'zod';
 import { passwordResetService } from '../services/passwordResetService';
 import {
@@ -7,7 +7,7 @@ import {
   ValidationError,
 } from '../middleware/error';
 
-const router = express.Router();
+export const router: Router = Router();
 
 // Validation schemas
 const requestResetSchema = z.object({
@@ -83,5 +83,3 @@ router.post(
     sendSuccess(res, null, result.message);
   })
 );
-
-export default router;

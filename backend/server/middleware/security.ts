@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { logger, LogLevel } from '../utils/logger';
 
 // Extend Express Request interface to include CSRF token
-declare module 'express-serve-static-core' {
+declare module 'express' {
   interface Request {
     csrfToken?: string;
     securityContext?: {
@@ -12,6 +12,15 @@ declare module 'express-serve-static-core' {
       ip: string;
       timestamp: Date;
     };
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      csrfToken?: string;
+      securityContext?: any;
+    }
   }
 }
 

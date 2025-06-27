@@ -26,23 +26,40 @@ import {
 } from './middleware/security';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { router as authRoutes } from './routes/auth';
+import { router as carRoutes } from './routes/cars';
+import { router as userRoutes } from './routes/users';
+import { router as uploadRoutes } from './routes/upload';
+import { router as passwordResetRoutes } from './routes/passwordReset';
 
 // Load environment variables
 dotenv.config();
 
-const app = express();
+const app: any = express();
 const PORT = process.env.PORT || 3000;
 
 // Trust proxy for accurate IP addresses
 app.set('trust proxy', process.env.TRUST_PROXY === 'true');
 
+// Utility to log route registration
+function logRouteRegistration(method: string, pathOrHandler: any) {
+  if (typeof pathOrHandler === 'string') {
+    console.log(`[ROUTE REGISTER] ${method}: ${pathOrHandler}`);
+  } else {
+    console.log(`[ROUTE REGISTER] ${method}: <handler>`);
+  }
+}
+
 // Security Context (must be first)
+logRouteRegistration('use', addSecurityContext);
 app.use(addSecurityContext);
 
 // Enhanced Security Headers
+logRouteRegistration('use', enhancedSecurityHeaders);
 app.use(enhancedSecurityHeaders);
 
 // Security middleware
+logRouteRegistration('use', 'helmet');
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -57,6 +74,7 @@ app.use(
 );
 
 // CORS configuration
+logRouteRegistration('use', 'cors');
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
@@ -72,9 +90,11 @@ app.use(
 );
 
 // Cookie parser (required for CSRF)
+logRouteRegistration('use', 'cookieParser');
 app.use(cookieParser());
 
 // Advanced Rate limiting with IP blocking
+logRouteRegistration('use', '/api');
 app.use(
   '/api',
   advancedRateLimit({
@@ -110,24 +130,35 @@ const limiter = rateLimit({
     });
   },
 });
+logRouteRegistration('use', 'limiter');
 app.use(limiter);
 
 // Security monitoring and audit logging
+logRouteRegistration('use', 'securityMonitoring');
 app.use(securityMonitoring);
+logRouteRegistration('use', 'auditLogger');
 app.use(auditLogger);
 
 // Request parsing and validation
+logRouteRegistration('use', 'json parser');
 app.use(express.json({ limit: '10mb' }));
+logRouteRegistration('use', 'urlencoded parser');
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+logRouteRegistration('use', 'compression');
 app.use(compression());
 
 // Input sanitization (commented out temporarily to fix deployment)
+// logRouteRegistration('use', 'sanitizeInput');
 // app.use(sanitizeInput);
 
 // Request validation middleware
+logRouteRegistration('use', 'validateRequestSize');
 app.use(validateRequestSize());
+logRouteRegistration('use', 'validateContentType');
 app.use(validateContentType());
+logRouteRegistration('use', 'addRequestId');
 app.use(addRequestId);
+logRouteRegistration('use', 'addSecurityHeaders');
 app.use(addSecurityHeaders);
 
 // Logging middleware
@@ -144,6 +175,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // CSRF token generation for web clients
+logRouteRegistration('use', 'setCsrfToken');
 app.use('/api/csrf-token', setCsrfToken, (req, res) => {
   res.json({
     success: true,
@@ -153,9 +185,11 @@ app.use('/api/csrf-token', setCsrfToken, (req, res) => {
 });
 
 // CSRF protection for state-changing operations
+logRouteRegistration('use', 'csrfProtection');
 app.use(csrfProtection());
 
 // Health check endpoint (before authentication)
+logRouteRegistration('get', '/health');
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
@@ -166,18 +200,26 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-// TODO: Import and use your API routes here
-// app.use('/api/auth', authRoutes);
-// app.use('/api/vehicles', vehicleRoutes);
-// app.use('/api/admin', adminRoutes);
+logRouteRegistration('use', '/api/auth');
+app.use('/api/auth', authRoutes);
+logRouteRegistration('use', '/api/cars');
+app.use('/api/cars', carRoutes);
+logRouteRegistration('use', '/api/users');
+app.use('/api/users', userRoutes);
+logRouteRegistration('use', '/api/upload');
+app.use('/api/upload', uploadRoutes);
+logRouteRegistration('use', '/api/password-reset');
+app.use('/api/password-reset', passwordResetRoutes);
 
 // Serve frontend static files in production
 if (process.env.NODE_ENV === 'production') {
   const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+  logRouteRegistration('use', 'static frontend');
   app.use(express.static(frontendDistPath));
 
   // For any non-API route, serve index.html (for React Router)
-  app.get('*', (req, res, next) => {
+  logRouteRegistration('get', '* (frontend fallback)');
+  app.get('/*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
       return next();
     }
@@ -186,9 +228,11 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Catch-all for undefined routes
+logRouteRegistration('use', 'notFoundHandler');
 app.use(notFoundHandler);
 
 // Global error handler (must be last)
+logRouteRegistration('use', 'errorHandler');
 app.use(errorHandler);
 
 // Initialize Redis connection
@@ -205,51 +249,12 @@ const initializeServer = async () => {
       logger.info(
         `🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`
       );
-      logger.info(
-        `📊 Health check available at http://localhost:${PORT}/health`
-      );
-
-      if (process.env.NODE_ENV === 'development') {
-        logger.info(
-          `🔒 CSRF token endpoint: http://localhost:${PORT}/api/csrf-token`
-        );
-        logger.info(`📋 API documentation: http://localhost:${PORT}/api/docs`);
-      }
     });
   } catch (error) {
-    logger.error(
-      'Failed to initialize server',
-      error instanceof Error ? error : new Error(String(error))
-    );
+    logger.error('Error initializing server:', error);
     process.exit(1);
   }
 };
 
-// Handle uncaught exceptions and unhandled rejections
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception', error);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at Promise', new Error(String(reason)), {
-    promise: promise.toString(),
-  });
-  process.exit(1);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  process.exit(0);
-});
-
-// Initialize server
 initializeServer();
-
 export default app;

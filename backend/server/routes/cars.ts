@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import {
   eq,
   and,
@@ -32,7 +32,7 @@ import {
   DatabaseError,
 } from '../middleware/error';
 
-const router = express.Router();
+export const router: Router = Router();
 
 // GET /api/cars - Get all cars with filtering, sorting, and pagination
 router.get(
@@ -725,5 +725,3 @@ router.post(
     );
   })
 );
-
-export default router;

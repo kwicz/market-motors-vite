@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { db } from '../../lib/db';
 import { users, sessions } from '../../lib/db/schema';
 import { emailVerificationTokens } from '../../lib/db/schema';
@@ -21,7 +21,7 @@ import {
 } from '../middleware/error';
 import { authenticate } from '../middleware/auth';
 
-const router = express.Router();
+export const router: Router = Router();
 
 /**
  * POST /api/auth/register
@@ -476,5 +476,3 @@ router.post(
     sendSuccess(res, null, 'Email verified successfully');
   })
 );
-
-export default router;

@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction, Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { z } from 'zod';
@@ -15,7 +15,7 @@ import {
 import { sendSuccess, ValidationError, AppError } from '../middleware/error';
 import { authenticate, requireAdmin } from '../middleware/auth';
 
-const router = express.Router();
+export const router: Router = Router();
 
 // Configure multer for memory storage (we'll process images in memory)
 const storage = multer.memoryStorage();
@@ -331,5 +331,3 @@ router.get(
     );
   })
 );
-
-export default router;

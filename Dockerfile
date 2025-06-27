@@ -1,24 +1,26 @@
 # ---------- Build Frontend ----------
 FROM node:20 AS frontend-build
 WORKDIR /app/frontend
-COPY frontend/package*.json ./
+COPY frontend/package.json ./
+COPY frontend/pnpm-lock.yaml ./
 COPY frontend/.npmrc ./
-RUN npm ci --prefer-offline --no-audit --no-fund
+RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile
 COPY frontend .
-RUN npm run build
+RUN pnpm run build
 
 # ---------- Build Backend ----------
 FROM node:20-alpine AS backend-build
 WORKDIR /app/backend
-COPY backend/package*.json ./
+COPY backend/package.json ./
+COPY backend/pnpm-lock.yaml ./
 COPY backend/.npmrc ./
-RUN npm ci --prefer-offline --no-audit --no-fund
+RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile
 COPY backend .
-RUN npm run build
-RUN npm ci --prefer-offline --no-audit --no-fund --omit=dev
+RUN pnpm run build
+RUN pnpm prune --prod
 
 # ---------- Production Image ----------
-FROM node:20-alpine
+FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -36,13 +38,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start backend server
-CMD ["npm", "start"]
-
-# Clean up frontend dependencies
-RUN npm install
-cd frontend
-npm run build
-cd ..
-
-# Upgrade npm
-RUN npm install -g npm@latest 
+CMD ["node", "server/dist/server/index.js"] 

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { eq, and, desc, count, ilike, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../lib/db';
@@ -27,7 +27,7 @@ import {
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 
-const router = express.Router();
+export const router: Router = Router();
 
 // Query parameters schema for user listing
 const userListQuerySchema = z.object({
@@ -625,5 +625,3 @@ router.post(
     sendSuccess(res, null, 'Two-factor authentication disabled');
   })
 );
-
-export default router;

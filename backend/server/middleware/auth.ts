@@ -12,7 +12,7 @@ import { eq } from 'drizzle-orm';
 import { logger } from '../utils/logger';
 
 // Extend Express Request interface to include user data
-declare module 'express-serve-static-core' {
+declare module 'express' {
   interface Request {
     user?: {
       id: string;
@@ -21,6 +21,14 @@ declare module 'express-serve-static-core' {
       username?: string;
       isActive: boolean;
     };
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
   }
 }
 
