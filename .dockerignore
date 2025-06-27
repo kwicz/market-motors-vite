@@ -1,16 +1,15 @@
+# Dependencies
 node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.npm
-.yarn-integrity
 
-# Build outputs
+# Production build
 dist
 build
-.next
 
 # Environment files
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -22,90 +21,46 @@ build
 *.swp
 *.swo
 
-# OS generated files
+# OS files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Testing
+coverage
+.nyc_output
 
 # Logs
 logs
 *.log
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# Server directory (not needed for frontend build)
+server
 
-# Coverage directory used by tools like istanbul
-coverage
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-.env.test
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-
-# Storybook build outputs
-.out
-.storybook-out
-
-# Temporary folders
-tmp/
-temp/
-
-# Editor directories and files
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Testing
-e2e/test-results/
-e2e/playwright-report/
-test-results/
-playwright-report/
-
-# Database
+# Database files
 *.db
 *.sqlite
 
-# Railway
-.railway/ 
+# Temporary files
+tmp
+temp
+
+# Documentation
+README.md
+*.md
+
+# Scripts
+scripts
+
+# Test files
+**/*.test.*
+**/*.spec.*
+__tests__
+e2e
+
+# Playwright
+playwright-report
+test-results 

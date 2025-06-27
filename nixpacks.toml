@@ -1,4 +1,4 @@
-# Nixpacks Configuration for Market Motors
+# Nixpacks Configuration for Market Motors Frontend
 # This file configures the build process for Railway deployment
 
 [phases.setup]
@@ -6,7 +6,7 @@ nixPkgs = ["nodejs-20_x", "npm-9_x"]
 
 [phases.install]
 cmds = [
-    "npm ci --prefer-offline --no-audit --no-fund --maxsockets=1 --cache-max=0"
+    "npm ci --prefer-offline --no-audit --no-fund --maxsockets=1"
 ]
 
 [phases.build]
@@ -15,16 +15,14 @@ cmds = [
 ]
 
 [start]
-cmd = "npm run preview"
+cmd = "npm run preview -- --host 0.0.0.0"
 
 [variables]
 NODE_ENV = "production"
 NPM_CONFIG_AUDIT = "false"
 NPM_CONFIG_FUND = "false"
 NPM_CONFIG_MAXSOCKETS = "1"
-NPM_CONFIG_CACHE_MAX = "0"
-NPM_CONFIG_PRODUCTION = "true"
-NODE_OPTIONS = "--max-old-space-size=512"
+NODE_OPTIONS = "--max-old-space-size=768"
 
 [staticAssets]
 # Serve static assets from the dist directory
