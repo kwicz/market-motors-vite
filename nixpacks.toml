@@ -6,7 +6,7 @@ nixPkgs = ["nodejs-20_x", "npm-9_x"]
 
 [phases.install]
 cmds = [
-    "npm ci --omit=dev --prefer-offline --no-audit --no-fund --maxsockets=1"
+    "npm ci --omit=dev --prefer-offline --no-audit --no-fund --maxsockets=1 --cache-max=0"
 ]
 
 [phases.build]
@@ -22,7 +22,9 @@ NODE_ENV = "production"
 NPM_CONFIG_AUDIT = "false"
 NPM_CONFIG_FUND = "false"
 NPM_CONFIG_MAXSOCKETS = "1"
-NODE_OPTIONS = "--max-old-space-size=1024"
+NPM_CONFIG_CACHE_MAX = "0"
+NPM_CONFIG_PRODUCTION = "true"
+NODE_OPTIONS = "--max-old-space-size=512"
 
 [staticAssets]
 # Serve static assets from the dist directory
