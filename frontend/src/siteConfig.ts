@@ -2,6 +2,16 @@
 
 export interface SiteConfig {
   siteName: string;
+  legalName?: string;
+  url?: string;
+  logo?: string;
+  geo?: {
+    latitude: number;
+    longitude: number;
+  };
+  sameAs?: string[];
+  founder?: string;
+  foundingDate?: string;
   heroSlides: Array<{
     image: string;
     title: string;
@@ -57,6 +67,21 @@ export interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
   siteName: 'Market Motors',
+  legalName: 'Market Motors LLC',
+  url: 'https://marketmotors.com',
+  logo: '/logo.png',
+  geo: {
+    latitude: 41.637524,
+    longitude: -85.925381,
+  },
+  sameAs: [
+    // Add social/profile URLs if available
+    'https://www.facebook.com/marketmotors',
+    // 'https://twitter.com/marketmotors',
+    // 'https://www.instagram.com/marketmotors',
+  ],
+  founder: 'The Solewicz Family',
+  foundingDate: '2002-01-01',
   heroSlides: [
     {
       image:

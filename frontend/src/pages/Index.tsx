@@ -5,6 +5,40 @@ import FeaturedCars from '@/components/home/FeaturedCars';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from '@/siteConfig';
+import SeoJsonLd from '@/components/SeoJsonLd';
+
+const getOrganizationSchema = (config: typeof siteConfig) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: config.siteName,
+  ...(config.legalName && { legalName: config.legalName }),
+  ...(config.url && { url: config.url }),
+  ...(config.logo && { logo: config.logo }),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: config.contact.address,
+    addressLocality: 'Elkhart',
+    addressRegion: 'IN',
+    postalCode: '46517',
+    addressCountry: 'US',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: config.contact.phone,
+    email: config.contact.email,
+    contactType: 'customer service',
+  },
+  ...(config.geo && {
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: config.geo.latitude,
+      longitude: config.geo.longitude,
+    },
+  }),
+  ...(config.sameAs && config.sameAs.length > 0 && { sameAs: config.sameAs }),
+  ...(config.founder && { founder: config.founder }),
+  ...(config.foundingDate && { foundingDate: config.foundingDate }),
+});
 
 const Index = () => {
   useEffect(() => {
@@ -13,6 +47,7 @@ const Index = () => {
 
   return (
     <>
+      <SeoJsonLd schema={getOrganizationSchema(siteConfig)} />
       <Navbar />
       <main>
         <Hero />

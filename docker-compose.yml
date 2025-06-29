@@ -3,18 +3,19 @@ version: '3.8'
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15
+    image: postgres:16-alpine
     container_name: market-motors-db
     environment:
-      POSTGRES_DB: marketmotors
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: market_motors
+      POSTGRES_USER: market_motors_user
+      POSTGRES_PASSWORD: market_motors_password
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d marketmotors']
+      test: ['CMD-SHELL', 'pg_isready -U market_motors_user -d market_motors']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,7 +53,7 @@ services:
       PORT: 3000
 
       # Database Configuration
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/marketmotors
+      DATABASE_URL: postgresql://market_motors_user:market_motors_password@postgres:5432/market_motors
       DB_SSL: false
 
       # Redis Configuration
