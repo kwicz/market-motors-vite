@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 logs/
+
+.env*
+!.env.example
+
+.env.production

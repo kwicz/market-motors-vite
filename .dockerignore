@@ -8,7 +8,6 @@ yarn-error.log*
 # Frontend build files (not needed for backend)
 dist
 build
-src
 public
 index.html
 vite.config.ts

@@ -24,8 +24,10 @@ FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy backend build and node_modules
-COPY --from=backend-build /app/backend .
+# Copy backend build output
+COPY --from=backend-build /app/backend/server/dist /app/server/dist
+# Copy backend node_modules
+COPY --from=backend-build /app/backend/node_modules /app/node_modules
 
 # Copy frontend build into backend
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
